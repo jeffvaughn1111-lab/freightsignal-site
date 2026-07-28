@@ -47,8 +47,8 @@
     <a href="#faq" class="nav-link">FAQ</a>
   </div>
   <div class="nav-cta">
-    <a href="#" class="btn-outline" onclick="openModal(event)">Sign In</a>
-    <a href="#" class="btn-teal" onclick="openModal(event)">Start Free Trial</a>
+    <a href="https://forms.gle/dV7zN8Wv9ZCx5q1x6" target="_blank" class="btn-outline">Sign In</a>
+    <a href="#" class="btn-teal" onclick="openForm(event)">Start Free Trial</a>
   </div>
 </nav>
 
@@ -96,7 +96,7 @@
   </h1>
   <p class="hero-sub">FreightSignal monitors <strong>8 live news sources + 40+ local wires</strong> across your home market and target regions — then writes your <strong>LinkedIn outreach</strong> and sends it automatically.</p>
   <div class="hero-btns">
-    <a href="#" class="btn-hero-primary" onclick="openModal(event)">🚀 Start Free — 14 Days</a>
+    <a href="#" class="btn-hero-primary" onclick="openForm(event)">🚀 Start Free — 14 Days</a>
     <a href="#how" class="btn-hero-ghost">▶ How It Works</a>
   </div>
   <div class="hero-note">No credit card · Cancel anytime · Set up in 5 minutes</div>
@@ -451,7 +451,7 @@
           <li class="no">AI outreach writer</li>
           <li class="no">LinkedIn Auto-Pilot</li>
         </ul>
-        <a href="#" class="price-btn price-btn-ghost" onclick="openModal(event)">Start Free Trial</a>
+        <a href="#" class="price-btn price-btn-ghost" onclick="openForm(event)">Start Free Trial</a>
       </div>
       <div class="price-card pop">
         <div class="price-tier">GROWTH REP</div>
@@ -467,7 +467,7 @@
           <li>Instant alerts + daily digest</li>
           <li>Excel / CSV export</li>
         </ul>
-        <a href="#" class="price-btn price-btn-solid" onclick="openModal(event)">Start Free Trial</a>
+        <a href="#" class="price-btn price-btn-solid" onclick="openForm(event)">Start Free Trial</a>
       </div>
       <div class="price-card">
         <div class="price-tier">TEAM / AGENCY</div>
@@ -483,7 +483,7 @@
           <li>Admin reporting</li>
           <li>Priority support + onboarding call</li>
         </ul>
-        <a href="#" class="price-btn price-btn-ghost" onclick="openModal(event)">Get Started</a>
+        <a href="#" class="price-btn price-btn-ghost" onclick="openForm(event)">Get Started</a>
       </div>
     </div>
     <p style="text-align:center;margin-top:16px;font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:.5px">All plans include 14-day free trial · No credit card · Cancel anytime</p>
@@ -526,7 +526,7 @@
     <p class="cta-sub">Set your territory. Get your first signal. Send your first LinkedIn message. All within 5 minutes.</p>
     <div class="cta-form">
       <input type="email" class="cta-email" placeholder="your@email.com" id="cta-email">
-      <a href="#" class="btn-hero-primary" onclick="ctaGo(event)">Get Started →</a>
+      <a href="#" class="btn-hero-primary" onclick="openForm(event)">Get Started →</a>
     </div>
     <div class="cta-note">JOIN LOGISTICS SALES PROFESSIONALS ALREADY USING FREIGHTSIGNAL · 14-DAY FREE TRIAL</div>
   </div>
@@ -705,6 +705,12 @@ function toast(msg) {
   el.style.display = 'block';
   if (toastTimer) clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+
+
+function openForm(e) {
+  if(e) e.preventDefault();
+  window.open('https://forms.gle/dV7zN8Wv9ZCx5q1x6', '_blank');
 }
 
 </script>

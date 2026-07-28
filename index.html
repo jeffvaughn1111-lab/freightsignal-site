@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreightSignal — The Intelligence Engine for Logistics Sales</title>
+  <meta name="description" content="FreightSignal monitors 8 live news sources + 40+ local wires across your territory and automatically writes and sends your LinkedIn outreach. Freight-native AI signal intelligence.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ── NAV ───────────────────────────────────────── -->
+<nav>
+  <div class="nav-logo">
+    <img src="assets/logo.png" alt="FreightSignal">
+  </div>
+  <div class="nav-links">
+    <a href="#how" class="nav-link">How It Works</a>
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#regions" class="nav-link">Coverage</a>
+    <a href="#local-sources" class="nav-link">Local Sources</a>
+    <a href="#compare" class="nav-link">vs Google</a>
+    <a href="#pricing" class="nav-link">Pricing</a>
+    <a href="#faq" class="nav-link">FAQ</a>
+  </div>
+  <div class="nav-cta">
+    <a href="#" class="btn-outline" onclick="openModal(event)">Sign In</a>
+    <a href="#" class="btn-teal" onclick="openModal(event)">Start Free Trial</a>
+  </div>
+</nav>
+
+<!-- ── LIVE SIGNAL TICKER ────────────────────────── -->
+<div class="ticker">
+  <div class="ticker-label">📡 LIVE SIGNALS</div>
+  <div class="ticker-track-wrap">
+    <div class="ticker-track">
+      <div class="ticker-item"><span class="flag">🇵🇷</span><span class="company">Puma SE</span><span>opens first Puerto Rico flagship</span><span class="tag tag-store">NEW STORE</span></div>
+      <div class="ticker-item"><span class="flag">🇺🇸</span><span class="company">Chewy Inc.</span><span>775K sq ft Ocala FL fulfillment center</span><span class="tag tag-dc">NEW DC</span></div>
+      <div class="ticker-item"><span class="flag">🇭🇳</span><span class="company">Hanes Brands</span><span>$95M expansion — San Pedro Sula</span><span class="tag tag-plant">NEW PLANT</span></div>
+      <div class="ticker-item"><span class="flag">🇨🇷</span><span class="company">Boston Scientific</span><span>$150M Coyol Free Zone expansion</span><span class="tag tag-plant">NEW PLANT</span></div>
+      <div class="ticker-item"><span class="flag">🇵🇦</span><span class="company">Evergreen Marine</span><span>2.1M TEU terminal expansion — Colón</span><span class="tag tag-dc">NEW DC</span></div>
+      <div class="ticker-item"><span class="flag">🇩🇴</span><span class="company">Philip Morris Intl</span><span>$600M La Romana manufacturing</span><span class="tag tag-plant">NEW PLANT</span></div>
+      <div class="ticker-item"><span class="flag">🇬🇹</span><span class="company">Nestlé Guatemala</span><span>$120M coffee &amp; nutrition plant</span><span class="tag tag-plant">NEW PLANT</span></div>
+      <div class="ticker-item"><span class="flag">🇲🇽</span><span class="company">Tesla Gigafactory</span><span>Monterrey Phase 2 construction begins</span><span class="tag tag-plant">NEW PLANT</span></div>
+      <div class="ticker-item"><span class="flag">🇧🇷</span><span class="company">Mercado Libre</span><span>1.4M sq ft São Paulo logistics hub</span><span class="tag tag-dc">NEW DC</span></div>
+      <div class="ticker-item"><span class="flag">🇩🇪</span><span class="company">Volkswagen</span><span>Valencia EV battery gigafactory groundbreaking</span><span class="tag tag-plant">NEW PLANT</span></div>
+      <div class="ticker-item"><span class="flag">🇻🇳</span><span class="company">Samsung Electronics</span><span>$3.3B Vietnam chip packaging expansion</span><span class="tag tag-expand">EXPANSION</span></div>
+      <div class="ticker-item"><span class="flag">🇯🇵</span><span class="company">Toyota</span><span>new North America parts DC — Tennessee</span><span class="tag tag-dc">NEW DC</span></div>
+      <!-- duplicate for seamless loop -->
+      <div class="ticker-item"><span class="flag">🇵🇷</span><span class="company">Puma SE</span><span>opens first Puerto Rico flagship</span><span class="tag tag-store">NEW STORE</span></div>
+      <div class="ticker-item"><span class="flag">🇺🇸</span><span class="company">Chewy Inc.</span><span>775K sq ft Ocala FL fulfillment center</span><span class="tag tag-dc">NEW DC</span></div>
+      <div class="ticker-item"><span class="flag">🇭🇳</span><span class="company">Hanes Brands</span><span>$95M expansion — San Pedro Sula</span><span class="tag tag-plant">NEW PLANT</span></div>
+      <div class="ticker-item"><span class="flag">🇨🇷</span><span class="company">Boston Scientific</span><span>$150M Coyol Free Zone expansion</span><span class="tag tag-plant">NEW PLANT</span></div>
+      <div class="ticker-item"><span class="flag">🇵🇦</span><span class="company">Evergreen Marine</span><span>2.1M TEU terminal expansion — Colón</span><span class="tag tag-dc">NEW DC</span></div>
+      <div class="ticker-item"><span class="flag">🇩🇴</span><span class="company">Philip Morris Intl</span><span>$600M La Romana manufacturing</span><span class="tag tag-plant">NEW PLANT</span></div>
+      <div class="ticker-item"><span class="flag">🇬🇹</span><span class="company">Nestlé Guatemala</span><span>$120M coffee &amp; nutrition plant</span><span class="tag tag-plant">NEW PLANT</span></div>
+      <div class="ticker-item"><span class="flag">🇲🇽</span><span class="company">Tesla Gigafactory</span><span>Monterrey Phase 2 construction begins</span><span class="tag tag-plant">NEW PLANT</span></div>
+      <div class="ticker-item"><span class="flag">🇧🇷</span><span class="company">Mercado Libre</span><span>1.4M sq ft São Paulo logistics hub</span><span class="tag tag-dc">NEW DC</span></div>
+      <div class="ticker-item"><span class="flag">🇩🇪</span><span class="company">Volkswagen</span><span>Valencia EV battery gigafactory groundbreaking</span><span class="tag tag-plant">NEW PLANT</span></div>
+      <div class="ticker-item"><span class="flag">🇻🇳</span><span class="company">Samsung Electronics</span><span>$3.3B Vietnam chip packaging expansion</span><span class="tag tag-expand">EXPANSION</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── HERO ──────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-eye"><div class="dot"></div>REAL-TIME FREIGHT INTELLIGENCE &amp; AI OUTREACH</div>
+  <h1>
+    <span class="line1">YOUR NEXT ACCOUNT</span>
+    <span class="line2">JUST MADE THE NEWS</span>
+    <span class="line3">ARE YOU FIRST?</span>
+  </h1>
+  <p class="hero-sub">FreightSignal monitors <strong>8 live news sources + 40+ local wires</strong> across your home market and target regions — then writes your <strong>LinkedIn outreach</strong> and sends it automatically.</p>
+  <div class="hero-btns">
+    <a href="#" class="btn-hero-primary" onclick="openModal(event)">🚀 Start Free — 14 Days</a>
+    <a href="#how" class="btn-hero-ghost">▶ How It Works</a>
+  </div>
+  <div class="hero-note">No credit card · Cancel anytime · Set up in 5 minutes</div>
+  <div class="hero-stats">
+    <div><div class="hero-stat-val" id="hs1">0</div><div class="hero-stat-lbl">SIGNALS TRACKED DAILY</div></div>
+    <div><div class="hero-stat-val" id="hs2">0</div><div class="hero-stat-lbl">COUNTRIES &amp; TERRITORIES</div></div>
+    <div><div class="hero-stat-val" id="hs3">0%</div><div class="hero-stat-lbl">AVG LINKEDIN REPLY RATE</div></div>
+    <div><div class="hero-stat-val" id="hs4">$0K</div><div class="hero-stat-lbl">AVG NEW PIPELINE / REP</div></div>
+    <div><div class="hero-stat-val" id="hs5">0s</div><div class="hero-stat-lbl">SIGNAL → PITCH SENT</div></div>
+  </div>
+</section>
+
+<!-- ── APP MOCKUP ─────────────────────────────────── -->
+<div class="mockup-wrap fade-in">
+  <div class="mockup-frame">
+    <div class="mockup-titlebar">
+      <div class="m-dot" style="background:#FF5F57"></div>
+      <div class="m-dot" style="background:#FFBD2E"></div>
+      <div class="m-dot" style="background:#27C93F"></div>
+      <div class="mockup-url">app.freightsignal.io/dashboard — Jacksonville, FL · Mexico &amp; Central America</div>
+    </div>
+    <div class="mockup-app">
+      <div class="mockup-sidebar">
+        <div class="sidebar-item active"><div class="sidebar-dot"></div>DASHBOARD</div>
+        <div class="sidebar-item"><div class="sidebar-dot"></div>LIVE SIGNALS</div>
+        <div class="sidebar-item" style="color:#00c8c8"><div class="sidebar-dot"></div>LEAD PIPELINE</div>
+        <div class="sidebar-item" style="color:#009898"><div class="sidebar-dot"></div>AI OUTREACH</div>
+        <div class="sidebar-item" style="color:#0A66C2"><div class="sidebar-dot"></div>LI AUTO-PILOT</div>
+        <div class="sidebar-sep">── MY TERRITORY ──</div>
+        <div class="sidebar-item" style="color:#00c8c8;font-size:8px"><div class="sidebar-dot"></div>🏠 Jacksonville, FL</div>
+        <div class="sidebar-item" style="color:#00c8c8;font-size:8px"><div class="sidebar-dot"></div>🇲🇽 Mexico</div>
+        <div class="sidebar-item" style="color:#00c8c8;font-size:8px"><div class="sidebar-dot"></div>🌎 Central America</div>
+        <div class="sidebar-item" style="font-size:8px"><div class="sidebar-dot"></div>+ 3 More Regions</div>
+      </div>
+      <div class="mockup-main">
+        <div class="mockup-stats">
+          <div class="mockup-stat"><div class="mockup-stat-val">47</div><div class="mockup-stat-lbl">Signals Today</div></div>
+          <div class="mockup-stat"><div class="mockup-stat-val">23</div><div class="mockup-stat-lbl">HOT Leads</div></div>
+          <div class="mockup-stat"><div class="mockup-stat-val">18</div><div class="mockup-stat-lbl">Msgs Sent</div></div>
+          <div class="mockup-stat"><div class="mockup-stat-val">21%</div><div class="mockup-stat-lbl">Reply Rate</div></div>
+          <div class="mockup-stat"><div class="mockup-stat-val">$340K</div><div class="mockup-stat-lbl">Pipeline</div></div>
+        </div>
+        <div class="mockup-table">
+          <div class="mockup-thead"><span>COMPANY / SIGNAL</span><span>TRADE LANE</span><span>TYPE</span><span>SCORE</span><span>ACTION</span></div>
+          <div class="mockup-row"><div><div class="row-co">Tesla Gigafactory MX</div><div class="row-sub">VP Logistics · Nuevo León</div></div><div class="row-lane">MX ↔ US Border</div><div><span class="badge badge-hot">HOT</span></div><div class="row-score">96</div><div><button class="row-action">SEND LI →</button></div></div>
+          <div class="mockup-row"><div><div class="row-co">Hanes Brands Honduras</div><div class="row-sub">Head of Logistics · San Pedro Sula</div></div><div class="row-lane">Puerto Cortés → US</div><div><span class="badge badge-hot">HOT</span></div><div class="row-score">91</div><div><button class="row-action">SEND LI →</button></div></div>
+          <div class="mockup-row"><div><div class="row-co">Chewy — Ocala DC</div><div class="row-sub">Dir. Supply Chain · Ocala FL</div></div><div class="row-lane">Ocala FL → Caribbean</div><div><span class="badge badge-warm">WARM</span></div><div class="row-score">84</div><div><button class="row-action">DRAFT</button></div></div>
+          <div class="mockup-row"><div><div class="row-co">Nestlé Guatemala</div><div class="row-sub">VP Supply Chain · Guatemala City</div></div><div class="row-lane">Puerto Quetzal → MIA</div><div><span class="badge badge-hot">HOT</span></div><div class="row-score">88</div><div><button class="row-action">SEND LI →</button></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── HOW IT WORKS ───────────────────────────────── -->
+<section id="how" class="section alt">
+  <div class="section-inner">
+    <div class="sec-label">HOW IT WORKS</div>
+    <h2 class="sec-h2">FROM NEWS TO BOOKED<br>MEETING IN 4 STEPS</h2>
+    <div class="steps-grid fade-in">
+      <div class="step-card"><div class="step-n">01 / DETECT</div><span class="step-icon">📡</span><div class="step-title">Signal Detected</div><div class="step-desc">FreightSignal scans 8 global news sources + 40+ local wires across your territory 24/7. New plant, DC, franchise, energy project — caught the moment it's announced.</div><span class="step-tag">8 SOURCES · REAL-TIME</span></div>
+      <div class="step-card"><div class="step-n">02 / SCORE</div><span class="step-icon">🎯</span><div class="step-title">Freight Scored</div><div class="step-desc">AI evaluates every signal for freight relevance — cargo type, HS codes, trade lane, port of entry, volume estimate, and urgency. You get a 0–100 score and written freight angle.</div><span class="step-tag">AI SCORING · HS CODES</span></div>
+      <div class="step-card"><div class="step-n">03 / ALERT</div><span class="step-icon">📧</span><div class="step-title">Email Alert Sent</div><div class="step-desc">Instant email for HOT signals. Daily digest at 6 AM. Weekly summary. Every alert includes the signal, freight angle, contact name, and a one-click "Send to LinkedIn" button.</div><span class="step-tag">EMAIL · DIGEST · INSTANT</span></div>
+      <div class="step-card"><div class="step-n">04 / PILOT</div><span class="step-icon">💼</span><div class="step-title">LinkedIn Auto-Pilot</div><div class="step-desc">Your LinkedIn account sends a personalized connection request referencing the real expansion news, trade lane, and cargo type. Set daily limits. Replies come to your email.</div><span class="step-tag">YOUR LINKEDIN · AUTO-PILOT</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ───────────────────────────────────── -->
+<section id="features" class="section">
+  <div class="section-inner">
+    <div class="sec-label">FEATURES</div>
+    <h2 class="sec-h2">EVERY TOOL YOUR<br>SALES LANE NEEDS</h2>
+    <div class="features-grid fade-in">
+      <div class="feature-card highlight"><span class="feature-icon">🏠</span><div class="feature-title">Territory-First Design</div><div class="feature-desc">Set your home city or state first, then layer on focus regions and international lanes. Signals filtered to your territory from day one — not a global firehose.</div><span class="feature-tag">CORE FEATURE</span></div>
+      <div class="feature-card"><span class="feature-icon">📡</span><div class="feature-title">40+ Local News Sources</div><div class="feature-desc">Territory-activated local wires in Spanish, Portuguese, German, French, Vietnamese, and more — auto-translated before scoring. Catches signals 4–12 hours before English wires.</div><span class="feature-tag">INCLUDED ALL PLANS</span></div>
+      <div class="feature-card"><span class="feature-icon">🎯</span><div class="feature-title">Freight-Native AI Scoring</div><div class="feature-desc">Every signal scored 0–100 with HS codes, port of entry, cargo type, trade lane, and an AI-written freight opportunity angle specific to your territory and specialty.</div><span class="feature-tag">INCLUDED ALL PLANS</span></div>
+      <div class="feature-card"><span class="feature-icon">📧</span><div class="feature-title">Smart Email Alerts</div><div class="feature-desc">Instant alerts for HOT signals (score 80+). Daily digest at 6 AM. Weekly summary. All to your inbox with one-click "Send to LinkedIn" — no login required to act.</div><span class="feature-tag">FREE ADD-ON</span></div>
+      <div class="feature-card highlight"><span class="feature-icon">🤖</span><div class="feature-title">AI Outreach Writer</div><div class="feature-desc">Claude AI writes personalized LinkedIn messages referencing the actual expansion news, cargo type, HS codes, and trade lane. Real context from the signal — not templates.</div><span class="feature-tag">GROWTH &amp; TEAM PLANS</span></div>
+      <div class="feature-card highlight"><span class="feature-icon">💼</span><div class="feature-title">LinkedIn Auto-Pilot</div><div class="feature-desc">Connects to your own LinkedIn via secure session. Sends connection requests and follow-ups at limits you control. Replies forwarded to your email.</div><span class="feature-tag">GROWTH &amp; TEAM PLANS</span></div>
+      <div class="feature-card"><span class="feature-icon">🏛️</span><div class="feature-title">Government Signal APIs</div><div class="feature-desc">SEC EDGAR 8-K filings, USASpending.gov, EPA air permits, FTZ Board, Army Corps of Engineers, DOE loan guarantees — free government sources your competitors aren't monitoring.</div><span class="feature-tag">FREE · ZERO ADDED COST</span></div>
+      <div class="feature-card"><span class="feature-icon">📊</span><div class="feature-title">Excel / CSV Export</div><div class="feature-desc">Export your full pipeline with freight angle, HS codes, contact details, and estimated value to Excel or CSV — import directly to Salesforce, HubSpot, or any CRM.</div><span class="feature-tag">FREE ADD-ON</span></div>
+      <div class="feature-card"><span class="feature-icon">📈</span><div class="feature-title">Pipeline Dashboard</div><div class="feature-desc">Track every signal from discovery to outreach to reply to qualified opportunity. Territory performance, reply rates, top signals this week, and total pipeline value.</div><span class="feature-tag">INCLUDED ALL PLANS</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TERRITORY SETUP ─────────────────────────────── -->
+<section id="territory" class="section alt">
+  <div class="section-inner">
+    <div class="sec-label">YOUR TERRITORY · FIRST THING YOU SET UP</div>
+    <h2 class="sec-h2">SIGNALS FOR WHERE<br>YOU ACTUALLY SELL</h2>
+    <p class="sec-sub">Most reps work a home city or state plus 1–3 international lanes. FreightSignal is built around your territory — set it once, update any time.</p>
+    <div class="territory-box fade-in">
+      <div class="territory-header">
+        <span style="font-size:16px">⚙️</span>
+        <span class="territory-header-title">Territory Configuration — Jeff Vaughn · CBX Global</span>
+        <div class="territory-live">SIGNALS ACTIVE</div>
+      </div>
+      <div class="territory-cols">
+        <div class="territory-col">
+          <div class="col-label">🏠 HOME MARKET</div>
+          <select class="terr-select" onchange="toast('✓ Territory updated: '+this.value)">
+            <option>Florida</option><option>Texas</option><option>California</option><option>New York</option><option>Georgia</option>
+          </select>
+          <select class="terr-select" onchange="toast('✓ City updated: '+this.value)">
+            <option>Jacksonville</option><option>Miami</option><option>Tampa</option><option>Orlando</option>
+          </select>
+          <div class="pill-row">
+            <div class="pill on">🌴 Florida ×</div>
+            <div class="pill on">🏙️ Jacksonville ×</div>
+          </div>
+        </div>
+        <div class="territory-col">
+          <div class="col-label">🌎 FOCUS REGIONS</div>
+          <select class="terr-select" onchange="addRegion(this)">
+            <option value="">+ Add a region...</option>
+            <optgroup label="Caribbean"><option>🇵🇷 Puerto Rico</option><option>🇩🇴 Dominican Republic</option><option>🇯🇲 Jamaica</option></optgroup>
+            <optgroup label="Central America"><option>🇬🇹 Guatemala</option><option>🇭🇳 Honduras</option><option>🇨🇷 Costa Rica</option><option>🇵🇦 Panama</option><option>🇸🇻 El Salvador</option><option>🇳🇮 Nicaragua</option><option>🇧🇿 Belize</option></optgroup>
+            <optgroup label="North America"><option>🇲🇽 Mexico</option><option>🇨🇦 Canada</option></optgroup>
+            <optgroup label="South America"><option>🇨🇴 Colombia</option><option>🇧🇷 Brazil</option></optgroup>
+          </select>
+          <div class="pill-row">
+            <div class="pill on">🇲🇽 Mexico ×</div>
+            <div class="pill on">🇬🇹 Guatemala ×</div>
+            <div class="pill on">🇭🇳 Honduras ×</div>
+            <div class="pill on">🇨🇷 Costa Rica ×</div>
+          </div>
+        </div>
+        <div class="territory-col">
+          <div class="col-label">📡 SIGNAL TYPES</div>
+          <div class="signal-type-row">
+            <div class="sig-type">🏭 New Plants &amp; Manufacturing <span class="dot-on">●</span></div>
+            <div class="sig-type">📦 New Distribution Centers <span class="dot-on">●</span></div>
+            <div class="sig-type">🏪 New Store / Market Entry <span class="dot-on">●</span></div>
+            <div class="sig-type">⚡ Renewable Energy Projects <span class="dot-on">●</span></div>
+            <div class="sig-type">🏛️ Gov Grants &amp; Permits <span class="dot-on">●</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── EMAIL + LINKEDIN ALERTS ────────────────────── -->
+<section id="alerts" class="section">
+  <div class="section-inner">
+    <div class="sec-label">EMAIL ALERTS &amp; LINKEDIN AUTO-PILOT</div>
+    <h2 class="sec-h2">SIGNALS REACH YOU.<br>YOU REACH THEM FIRST.</h2>
+    <p class="sec-sub">FreightSignal does the monitoring and the outreach. You review, approve, and close.</p>
+    <div class="alerts-grid fade-in">
+      <div class="alert-card">
+        <div class="alert-card-head">
+          <span>📧</span>
+          <div><div class="alert-card-title">Email Alert — HOT Signal Detected</div><div class="alert-card-sub">Delivered within minutes of publication</div></div>
+          <div class="alert-live">INSTANT ALERT</div>
+        </div>
+        <div class="alert-body">
+          <div class="email-mock">
+            <div class="email-head">
+              <div class="email-from">From: <strong>FreightSignal</strong> &lt;alerts@freightsignal.io&gt;</div>
+              <div class="email-subject">🔴 HOT — Hanes Brands $95M plant · San Pedro Sula, HN · Score 91/100</div>
+            </div>
+            <div class="email-body">
+              <strong>New freight opportunity in your Honduras territory.</strong><br><br>
+              <div class="email-signal">
+                <div class="email-signal-co">Hanes Brands — San Pedro Sula, Honduras</div>
+                <div class="email-signal-detail">$95M plant expansion · +3,200 jobs · US apparel &amp; activewear<br>Trade lane: Puerto Cortés → US East Coast · HS 6109, 5208<br>Contact: Carlos Mejía, VP Logistics</div>
+              </div>
+              <strong>Freight angle:</strong> Expansion adds export volume through Puerto Cortés — position for Honduras → Jacksonville or Miami FCL lane.<br><br>
+              <a href="#" class="email-btn" onclick="return false">📤 SEND LINKEDIN MESSAGE NOW</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="alert-card">
+        <div class="alert-card-head">
+          <span>💼</span>
+          <div><div class="alert-card-title">LinkedIn Auto-Pilot — Your Account</div><div class="alert-card-sub">Sends from your LinkedIn · You set the daily limits</div></div>
+          <div class="alert-live">CONNECTED</div>
+        </div>
+        <div class="alert-body">
+          <div class="li-mock">
+            <div class="li-topbar">
+              <div class="li-in">in</div>
+              <span class="li-topbar-title">Sending from: Jeff Vaughn · CBX Global</span>
+              <div class="li-topbar-status">Active · 12/15 sent today</div>
+            </div>
+            <div class="li-body">
+              <div class="li-profile">
+                <div class="li-avatar">👨</div>
+                <div><div class="li-name">Carlos Mejía</div><div class="li-role">VP Logistics · Hanes Brands · San Pedro Sula, HN</div></div>
+              </div>
+              <div class="li-message">
+                Hi <strong>Carlos</strong> — I saw the announcement on Hanes' <strong>$95M San Pedro Sula expansion</strong>. We handle freight through <strong>Puerto Cortés</strong> regularly and have direct carrier relationships on the <strong>Honduras → US East Coast</strong> lane. Would it make sense to connect ahead of your new production lines coming online?
+              </div>
+              <div class="li-actions">
+                <button class="li-send" onclick="toast('✓ Connection request queued for delivery')">✓ Approve &amp; Send</button>
+                <button class="li-edit">Edit</button>
+              </div>
+              <div class="li-queue"><strong>3 more</strong> signals queued · Daily limit: 15 · Replies to your email</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LOCAL SOURCES ───────────────────────────────── -->
+<section id="local-sources" class="section alt">
+  <div class="section-inner">
+    <div class="sec-label">LOCAL SOURCE INTELLIGENCE</div>
+    <h2 class="sec-h2">WE MONITOR THE SOURCES<br>GOOGLE DOESN'T EVEN INDEX</h2>
+    <p class="sec-sub">When you set your territory, FreightSignal activates local news wires in that market — in the local language, auto-translated before scoring. Sources your competitors aren't watching.</p>
+    <div class="sources-box fade-in">
+      <div class="sources-head">
+        <span>📡</span>
+        <span class="sources-head-title">Active sources — Jacksonville FL · Mexico · Central America</span>
+        <div class="sources-active">31 local sources active</div>
+      </div>
+      <div class="sources-cols">
+        <div class="sources-col">
+          <div class="sources-col-label">🏠 Home — Jacksonville, FL</div>
+          <div class="source-item">Jacksonville Business Journal <span class="source-tag">RSS</span></div>
+          <div class="source-item">FreightWaves <span class="source-tag">FREE RSS</span></div>
+          <div class="source-item">Journal of Commerce <span class="source-tag">FREE RSS</span></div>
+          <div class="source-item">SEC EDGAR 8-K <span class="source-tag">FREE API</span></div>
+          <div class="source-item">FL Commerce Permits <span class="source-tag">FREE</span></div>
+          <div class="source-item">DC Velocity <span class="source-tag">FREE RSS</span></div>
+        </div>
+        <div class="sources-col">
+          <div class="sources-col-label">🇲🇽 Mexico</div>
+          <div class="source-item">El Economista <span class="source-tag">FREE RSS · ES</span></div>
+          <div class="source-item">El Financiero <span class="source-tag">FREE RSS · ES</span></div>
+          <div class="source-item">Reforma Negocios <span class="source-tag">FREE RSS · ES</span></div>
+          <div class="source-item">Borderlands MX (FW) <span class="source-tag">FREE RSS</span></div>
+          <div class="source-item">El Diario de Juárez <span class="source-tag">FREE RSS · ES</span></div>
+          <div class="source-item">ProMéxico feed <span class="source-tag">FREE</span></div>
+        </div>
+        <div class="sources-col">
+          <div class="sources-col-label">🌎 Central America</div>
+          <div class="source-item">Prensa Libre — GT <span class="source-tag">FREE RSS · ES</span></div>
+          <div class="source-item">La Prensa — HN <span class="source-tag">FREE RSS · ES</span></div>
+          <div class="source-item">El Financiero CR <span class="source-tag">FREE RSS · ES</span></div>
+          <div class="source-item">La Estrella — PA <span class="source-tag">FREE RSS · ES</span></div>
+          <div class="source-item">Nearshore Americas <span class="source-tag">FREE RSS</span></div>
+          <div class="source-item">CaribPR Wire <span class="source-tag">FREE RSS</span></div>
+        </div>
+        <div class="sources-col">
+          <div class="sources-col-label">🏝️ Caribbean</div>
+          <div class="source-item">El Nuevo Día — PR <span class="source-tag">FREE RSS · ES</span></div>
+          <div class="source-item">Listín Diario — DR <span class="source-tag">FREE RSS · ES</span></div>
+          <div class="source-item">Diario Libre — DR <span class="source-tag">FREE RSS · ES</span></div>
+          <div class="source-item">CaribPR Wire <span class="source-tag">FREE RSS</span></div>
+          <div class="source-item">Jamaica Gleaner Biz <span class="source-tag">FREE RSS</span></div>
+        </div>
+        <div class="sources-col">
+          <div class="sources-col-label">🌏 Asia</div>
+          <div class="source-item">Nikkei Asia <span class="source-tag">FREE RSS</span></div>
+          <div class="source-item">South China Morning Post <span class="source-tag">FREE RSS</span></div>
+          <div class="source-item">Economic Times Logistics <span class="source-tag">FREE RSS</span></div>
+          <div class="source-item">Korea Herald Business <span class="source-tag">FREE RSS</span></div>
+          <div class="source-item">VietnamBiz <span class="source-tag">FREE RSS · VI</span></div>
+        </div>
+        <div class="sources-col">
+          <div class="sources-col-label">🌍 Europe</div>
+          <div class="source-item">Handelsblatt — DE <span class="source-tag">FREE RSS · DE</span></div>
+          <div class="source-item">Les Échos — FR <span class="source-tag">FREE RSS · FR</span></div>
+          <div class="source-item">Expansión — ES <span class="source-tag">FREE RSS · ES</span></div>
+          <div class="source-item">Logistics Manager UK <span class="source-tag">FREE RSS</span></div>
+          <div class="source-item">Il Sole 24 Ore — IT <span class="source-tag">FREE RSS · IT</span></div>
+        </div>
+      </div>
+      <div class="sources-footer">
+        <div class="sources-stat"><strong>40+</strong> local sources total</div>
+        <div class="sources-stat"><strong>FREE RSS</strong> = zero added cost</div>
+        <div class="sources-stat"><strong>12+</strong> languages auto-translated</div>
+        <div class="sources-stat"><strong>Only your territory</strong> sources active</div>
+      </div>
+    </div>
+    <div class="sources-explainer">
+      <div class="explainer-card"><div class="explainer-icon">🗺️</div><div class="explainer-title">Territory sets your sources</div><div class="explainer-desc">Add Mexico and 7 Mexican publications activate instantly. Remove it and they go dark. Your source list matches your territory exactly.</div></div>
+      <div class="explainer-card"><div class="explainer-icon">🔄</div><div class="explainer-title">Auto-translated before scoring</div><div class="explainer-desc">A $120M plant in El Economista in Spanish is translated, freight-scored, and delivered as an English signal card with the original source cited.</div></div>
+      <div class="explainer-card"><div class="explainer-icon">⚡</div><div class="explainer-title">Hours before English wires</div><div class="explainer-desc">Major plant announcements in Mexico and Central America appear in local Spanish press 4–12 hours before Reuters picks them up. That's your competitive window.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── GOOGLE COMPARISON ───────────────────────────── -->
+<section id="compare" class="section">
+  <div class="section-inner">
+    <div class="sec-label">FREIGHTSIGNAL VS GOOGLE ALERTS</div>
+    <h2 class="sec-h2">GOOGLE SENDS A LINK.<br>WE SEND A BOOKED MEETING.</h2>
+    <p class="sec-sub">Research across 240 companies found Google Alerts misses <strong style="color:#ef4444">40% of relevant signals</strong> — and of alerts that arrive, only <strong style="color:#ef4444">10% are actually business-relevant</strong>.</p>
+    <div class="vs-table fade-in">
+      <div class="vs-thead">
+        <div class="vs-th">CAPABILITY</div>
+        <div class="vs-th">Google Alerts</div>
+        <div class="vs-th">Google News</div>
+        <div class="vs-th ours">📡 FreightSignal</div>
+      </div>
+      <div class="vs-row"><div class="vs-cell feat">Finds expansion signals</div><div class="vs-cell"><span class="part">~</span> Misses 40%</div><div class="vs-cell"><span class="part">~</span> Misses 40%</div><div class="vs-cell ours"><span class="check">✓</span> 8 sources + 40+ local wires</div></div>
+      <div class="vs-row"><div class="vs-cell feat">Filters for freight relevance</div><div class="vs-cell"><span class="cross">✗</span> No context</div><div class="vs-cell"><span class="cross">✗</span> No context</div><div class="vs-cell ours"><span class="check">✓</span> HS codes, ports, lanes</div></div>
+      <div class="vs-row"><div class="vs-cell feat">Territory-based filtering</div><div class="vs-cell"><span class="cross">✗</span></div><div class="vs-cell"><span class="cross">✗</span></div><div class="vs-cell ours"><span class="check">✓</span> City, state, or country</div></div>
+      <div class="vs-row"><div class="vs-cell feat">Local Spanish / regional press</div><div class="vs-cell"><span class="cross">✗</span> Usually missed</div><div class="vs-cell"><span class="cross">✗</span> Usually missed</div><div class="vs-cell ours"><span class="check">✓</span> 12+ languages, auto-translated</div></div>
+      <div class="vs-row"><div class="vs-cell feat">Identifies decision maker</div><div class="vs-cell"><span class="cross">✗</span></div><div class="vs-cell"><span class="cross">✗</span></div><div class="vs-cell ours"><span class="check">✓</span> Name + title via LinkedIn</div></div>
+      <div class="vs-row"><div class="vs-cell feat">Writes the pitch message</div><div class="vs-cell"><span class="cross">✗</span></div><div class="vs-cell"><span class="cross">✗</span></div><div class="vs-cell ours"><span class="check">✓</span> Claude AI, personalized</div></div>
+      <div class="vs-row"><div class="vs-cell feat">Sends LinkedIn connection</div><div class="vs-cell"><span class="cross">✗</span></div><div class="vs-cell"><span class="cross">✗</span></div><div class="vs-cell ours"><span class="check">✓</span> Auto-Pilot, your account</div></div>
+      <div class="vs-row"><div class="vs-cell feat">Government signal APIs</div><div class="vs-cell"><span class="cross">✗</span></div><div class="vs-cell"><span class="cross">✗</span></div><div class="vs-cell ours"><span class="check">✓</span> SEC, EPA, FTZ, DOE, USDA</div></div>
+      <div class="vs-row"><div class="vs-cell feat">Signal → pitch sent</div><div class="vs-cell"><span class="cross">✗</span> 2–3 hrs manual</div><div class="vs-cell"><span class="cross">✗</span> 2–3 hrs manual</div><div class="vs-cell ours"><span class="check">✓</span> &lt; 60 seconds</div></div>
+    </div>
+    <div class="vs-footnote">⚠ Source: Contify study of 240 companies — Google Alerts missed 40% of relevant signals; 90% of delivered alerts were not business-relevant.</div>
+  </div>
+</section>
+
+<!-- ── REGIONS ────────────────────────────────────── -->
+<section id="regions" class="section alt">
+  <div class="section-inner">
+    <div class="sec-label">GEOGRAPHIC COVERAGE</div>
+    <h2 class="sec-h2">SET YOUR LANES.<br>WE WATCH THEM ALL.</h2>
+    <p class="sec-sub">Select your home market first, then stack on regions. Add or remove any time — signals update instantly.</p>
+    <div class="regions-list fade-in">
+      <div class="region-row"><div class="region-head" onclick="toggleRegion(this)"><span class="region-flag">🇺🇸🇨🇦🇲🇽</span><span class="region-name">North America — US States, Canada, Mexico</span><span class="region-count">50 US States · 10 CA Provinces · 32 MX States</span><span class="region-chevron">▼</span></div><div class="region-body open"><div class="region-chip on">🏙️ By City</div><div class="region-chip on">📍 By US State (All 50)</div><div class="region-chip">🇨🇦 Canada</div><div class="region-chip">🇲🇽 Mexico — Monterrey, CDMX, Guadalajara, Tijuana</div></div></div>
+      <div class="region-row"><div class="region-head" onclick="toggleRegion(this)"><span class="region-flag">🏝️</span><span class="region-name">Caribbean</span><span class="region-count">9 territories</span><span class="region-chevron">▶</span></div><div class="region-body"><div class="region-chip on">🇵🇷 Puerto Rico</div><div class="region-chip on">🇩🇴 Dominican Republic</div><div class="region-chip">🇯🇲 Jamaica</div><div class="region-chip">🇹🇹 Trinidad &amp; Tobago</div><div class="region-chip">🇧🇧 Barbados</div><div class="region-chip">🇧🇸 Bahamas</div><div class="region-chip">🇨🇼 Curaçao</div><div class="region-chip">🇭🇹 Haiti</div><div class="region-chip">🇨🇺 Cuba</div></div></div>
+      <div class="region-row"><div class="region-head" onclick="toggleRegion(this)"><span class="region-flag">🌎</span><span class="region-name">Central America — All 7 Countries</span><span class="region-count">7 countries · Key ports covered</span><span class="region-chevron">▶</span></div><div class="region-body"><div class="region-chip">🇬🇹 Guatemala · Puerto Quetzal</div><div class="region-chip">🇧🇿 Belize</div><div class="region-chip">🇭🇳 Honduras · Puerto Cortés</div><div class="region-chip">🇸🇻 El Salvador · Acajutla</div><div class="region-chip">🇳🇮 Nicaragua · Puerto Corinto</div><div class="region-chip on">🇨🇷 Costa Rica · Caldera</div><div class="region-chip on">🇵🇦 Panama · Colón, Balboa</div></div></div>
+      <div class="region-row"><div class="region-head" onclick="toggleRegion(this)"><span class="region-flag">🌎</span><span class="region-name">South America</span><span class="region-count">8 countries</span><span class="region-chevron">▶</span></div><div class="region-body"><div class="region-chip">🇨🇴 Colombia</div><div class="region-chip">🇧🇷 Brazil</div><div class="region-chip">🇵🇪 Peru</div><div class="region-chip">🇨🇱 Chile</div><div class="region-chip">🇪🇨 Ecuador</div><div class="region-chip">🇻🇪 Venezuela</div><div class="region-chip">🇦🇷 Argentina</div><div class="region-chip">🇺🇾 Uruguay</div></div></div>
+      <div class="region-row"><div class="region-head" onclick="toggleRegion(this)"><span class="region-flag">🌏</span><span class="region-name">Asia — Key Manufacturing &amp; Export Markets</span><span class="region-count">10 countries</span><span class="region-chevron">▶</span></div><div class="region-body"><div class="region-chip">🇨🇳 China</div><div class="region-chip">🇯🇵 Japan</div><div class="region-chip">🇰🇷 South Korea</div><div class="region-chip">🇻🇳 Vietnam</div><div class="region-chip">🇮🇳 India</div><div class="region-chip">🇹🇭 Thailand</div><div class="region-chip">🇮🇩 Indonesia</div><div class="region-chip">🇹🇼 Taiwan</div><div class="region-chip">🇲🇾 Malaysia</div><div class="region-chip">🇵🇭 Philippines</div></div></div>
+      <div class="region-row"><div class="region-head" onclick="toggleRegion(this)"><span class="region-flag">🌍</span><span class="region-name">Europe</span><span class="region-count">12 countries</span><span class="region-chevron">▶</span></div><div class="region-body"><div class="region-chip">🇩🇪 Germany</div><div class="region-chip">🇳🇱 Netherlands</div><div class="region-chip">🇬🇧 United Kingdom</div><div class="region-chip">🇪🇸 Spain</div><div class="region-chip">🇮🇹 Italy</div><div class="region-chip">🇫🇷 France</div><div class="region-chip">🇧🇪 Belgium</div><div class="region-chip">🇵🇱 Poland</div><div class="region-chip">🇸🇪 Sweden</div><div class="region-chip">🇨🇿 Czech Republic</div><div class="region-chip">🇵🇹 Portugal</div><div class="region-chip">🇹🇷 Turkey</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRICING ─────────────────────────────────────── -->
+<section id="pricing" class="section">
+  <div class="section-inner">
+    <div class="sec-label">PRICING</div>
+    <h2 class="sec-h2">ONE DEAL PAYS FOR<br>YEARS OF SIGNALS.</h2>
+    <p class="sec-sub">The average new freight account is worth $80K–$250K/year. FreightSignal pays for itself the day you close your first signal-sourced deal.</p>
+    <div class="pricing-grid fade-in">
+      <div class="price-card">
+        <div class="price-tier">SOLO REP</div>
+        <div class="price-amount"><em>$</em>97</div>
+        <div class="price-period">/ MONTH</div>
+        <div class="price-tag">Territory-specific signals with email alerts — no cold calling from scratch.</div>
+        <ul class="price-features">
+          <li>1 home market + 2 focus regions</li>
+          <li>50 signals / month</li>
+          <li>Email alerts — instant &amp; daily digest</li>
+          <li>AI freight scoring + HS codes</li>
+          <li>Excel / CSV export</li>
+          <li class="no">AI outreach writer</li>
+          <li class="no">LinkedIn Auto-Pilot</li>
+        </ul>
+        <a href="#" class="price-btn price-btn-ghost" onclick="openModal(event)">Start Free Trial</a>
+      </div>
+      <div class="price-card pop">
+        <div class="price-tier">GROWTH REP</div>
+        <div class="price-amount"><em>$</em>297</div>
+        <div class="price-period">/ MONTH</div>
+        <div class="price-tag">Full territory, AI outreach, and LinkedIn Auto-Pilot in one subscription.</div>
+        <ul class="price-features">
+          <li>Home city/state + unlimited regions</li>
+          <li>Unlimited signals</li>
+          <li>40+ local sources activated</li>
+          <li>AI outreach writer (unlimited)</li>
+          <li>LinkedIn Auto-Pilot (your account)</li>
+          <li>Instant alerts + daily digest</li>
+          <li>Excel / CSV export</li>
+        </ul>
+        <a href="#" class="price-btn price-btn-solid" onclick="openModal(event)">Start Free Trial</a>
+      </div>
+      <div class="price-card">
+        <div class="price-tier">TEAM / AGENCY</div>
+        <div class="price-amount"><em>$</em>597</div>
+        <div class="price-period">/ MONTH · UP TO 5 REPS</div>
+        <div class="price-tag">Equip your full sales team with AI-powered territory intelligence.</div>
+        <ul class="price-features">
+          <li>Everything in Growth</li>
+          <li>5 rep seats — individual territories</li>
+          <li>5 LinkedIn accounts connected</li>
+          <li>Shared team pipeline dashboard</li>
+          <li>White-label option</li>
+          <li>Admin reporting</li>
+          <li>Priority support + onboarding call</li>
+        </ul>
+        <a href="#" class="price-btn price-btn-ghost" onclick="openModal(event)">Get Started</a>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:16px;font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:.5px">All plans include 14-day free trial · No credit card · Cancel anytime</p>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ────────────────────────────────── -->
+<section class="section alt">
+  <div class="section-inner">
+    <div class="sec-label">WHAT REPS ARE SAYING</div>
+    <h2 class="sec-h2">CLOSED FROM SIGNALS,<br>NOT COLD CALLS</h2>
+    <div class="test-grid fade-in">
+      <div class="test-card"><div class="test-stars">★★★★★</div><div class="test-quote">"Within 3 days I had a HOT signal for the Hanes plant expansion in Honduras. The LinkedIn message referenced their actual Puerto Cortés lane. VP Logistics replied same day. We're in contract talks."</div><div class="test-name">Marcus T.</div><div class="test-role">Ocean Freight BDM · Jacksonville, FL</div></div>
+      <div class="test-card"><div class="test-stars">★★★★★</div><div class="test-quote">"I used Google Alerts for years. FreightSignal showed me I was missing 40% of what was happening in my lanes. The Costa Rica medical device alerts alone opened 3 new air freight conversations in a month."</div><div class="test-name">Diana R.</div><div class="test-role">VP Business Development · Miami, FL</div></div>
+      <div class="test-card"><div class="test-stars">★★★★★</div><div class="test-quote">"FreightSignal caught the Tesla Monterrey Phase 2 announcement 6 hours after it dropped. My message was sent within the hour. I was first in the conversation. Closed a $180K cross-border account."</div><div class="test-name">Jorge M.</div><div class="test-role">Cross-Border Freight Specialist · Laredo, TX</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ────────────────────────────────────────── -->
+<section id="faq" class="section">
+  <div class="section-inner">
+    <div class="sec-label">FAQ</div>
+    <h2 class="sec-h2">QUESTIONS ANSWERED</h2>
+    <div class="faq-list fade-in">
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Why not just use Google Alerts?<span class="faq-icon">+</span></div><div class="faq-a">Google Alerts misses 40% of relevant signals and 90% of what it delivers is noise. Even when it finds a signal, it gives you a link — no freight context, no HS codes, no contact name, no message written, no LinkedIn sent. FreightSignal takes you from "signal detected" to "LinkedIn connection sent" in under 60 seconds. Google takes you to 2–3 hours of manual work.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">How does LinkedIn Auto-Pilot work? Do you need my password?<span class="faq-icon">+</span></div><div class="faq-a">No. We never ask for or store your LinkedIn password. You connect via your LinkedIn session cookie (li_at) — the same secure method used by Phantombuster, Expandi, and thousands of sales professionals daily. FreightSignal sends only messages you approve, at daily limits you control (default: 15 connections/day, well within LinkedIn's safe thresholds).</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Can I set my home city first, then add international lanes?<span class="faq-icon">+</span></div><div class="faq-a">That's exactly how it's designed. Step one when you sign up is setting your home city or state. From there you add focus regions — Mexico, Central America, Caribbean, Asian manufacturing hubs — layer by layer. Solo plan: 1 home market + 2 regions. Growth plan: unlimited regions. Change any time.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">What's covered in Central America and the Caribbean?<span class="faq-icon">+</span></div><div class="faq-a">All 7 Central American countries with port-specific intelligence for Puerto Cortés, Puerto Quetzal, Acajutla, Corinto, Caldera, Port of Colón, and Port of Balboa. Caribbean: Puerto Rico, Dominican Republic, Jamaica, Trinidad, Barbados, Bahamas, Curaçao, Haiti, Cuba. FreightSignal monitors Spanish-language local publications that Google Alerts routinely misses.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Can I export leads to Salesforce or HubSpot?<span class="faq-icon">+</span></div><div class="faq-a">Yes. All plans support CSV export. Growth and Team plans include formatted Excel export with signal data, cargo intelligence, HS codes, and estimated pipeline value — import directly into any CRM. Direct Salesforce connector on the roadmap for Q4 2026.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">What if I don't find value in the first 14 days?<span class="faq-icon">+</span></div><div class="faq-a">Cancel before day 14 and you owe nothing. No questions, no hard sell. Most users find their first actionable signal within 48 hours of setting their territory.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA BAND ────────────────────────────────────── -->
+<div class="cta-band">
+  <div class="cta-inner">
+    <h2 class="cta-h">YOUR NEXT CUSTOMER<br>JUST MADE THE NEWS</h2>
+    <p class="cta-sub">Set your territory. Get your first signal. Send your first LinkedIn message. All within 5 minutes.</p>
+    <div class="cta-form">
+      <input type="email" class="cta-email" placeholder="your@email.com" id="cta-email">
+      <a href="#" class="btn-hero-primary" onclick="ctaGo(event)">Get Started →</a>
+    </div>
+    <div class="cta-note">JOIN LOGISTICS SALES PROFESSIONALS ALREADY USING FREIGHTSIGNAL · 14-DAY FREE TRIAL</div>
+  </div>
+</div>
+
+<!-- ── FOOTER ──────────────────────────────────────── -->
+<footer>
+  <img src="assets/logo.png" alt="FreightSignal">
+  <div class="footer-links">
+    <a href="#" class="footer-link">Privacy Policy</a>
+    <a href="#" class="footer-link">Terms of Service</a>
+    <a href="#" class="footer-link">LinkedIn Safety Guide</a>
+    <a href="#" class="footer-link">API Docs</a>
+    <a href="#" class="footer-link">Contact</a>
+    <a href="#" class="footer-link">Affiliate Program</a>
+  </div>
+  <div class="footer-copy">© 2026 FreightSignal · Built for freight sales professionals.</div>
+</footer>
+
+<!-- ── SIGNUP MODAL ───────────────────────────────── -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <img src="assets/logo.png" alt="FreightSignal" class="modal-logo">
+    <h2 class="modal-title">Start Your Free Trial</h2>
+    <p class="modal-sub">14 days free · No credit card · Territory setup in 5 minutes</p>
+    <div class="modal-plans">
+      <div class="modal-plan" onclick="selectPlan('solo',this)"><div class="plan-name">Solo Rep</div><div class="plan-price"><em>$</em>97<em>/mo</em></div></div>
+      <div class="modal-plan sel" onclick="selectPlan('growth',this)"><div class="plan-name">Growth</div><div class="plan-price"><em>$</em>297<em>/mo</em></div></div>
+      <div class="modal-plan" onclick="selectPlan('team',this)"><div class="plan-name">Team</div><div class="plan-price"><em>$</em>597<em>/mo</em></div></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">First Name</label><input class="form-input" id="f-fn" type="text" placeholder="John"></div>
+      <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" id="f-ln" type="text" placeholder="Smith"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Work Email</label><input class="form-input" id="f-em" type="email" placeholder="john@yourcompany.com"></div>
+    <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="f-pw" type="password" placeholder="Min. 8 characters"></div>
+    <div class="form-group">
+      <label class="form-label">Home Market</label>
+      <select class="form-select" id="f-home">
+        <option value="">Select your home market...</option>
+        <optgroup label="US Cities"><option>Jacksonville, FL</option><option>Miami, FL</option><option>Houston, TX</option><option>Los Angeles, CA</option><option>New York, NY</option><option>Atlanta, GA</option><option>Chicago, IL</option><option>Dallas, TX</option><option>Laredo, TX</option></optgroup>
+        <optgroup label="US States"><option>Florida</option><option>Texas</option><option>California</option><option>New York</option><option>New Jersey</option><option>Georgia</option><option>Missouri</option></optgroup>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Primary Focus Region</label>
+      <select class="form-select" id="f-region">
+        <option value="">Select your focus region...</option>
+        <optgroup label="Caribbean"><option>Puerto Rico</option><option>Dominican Republic</option><option>Caribbean — All Islands</option></optgroup>
+        <optgroup label="Central America"><option>Mexico &amp; Central America</option><option>Mexico Only</option><option>Central America Only</option><option>Panama &amp; Canal Zone</option></optgroup>
+        <optgroup label="Americas"><option>US Domestic</option><option>US + Mexico Cross-Border</option><option>South America — LATAM</option></optgroup>
+        <optgroup label="Global"><option>Trans-Pacific (Asia → US)</option><option>Trans-Atlantic (Europe → US)</option><option>Global / All Regions</option></optgroup>
+      </select>
+    </div>
+    <button class="modal-submit" onclick="doSignup()" id="submit-btn">Create My Account &amp; Set Territory →</button>
+    <div class="modal-note">By signing up you agree to our <a href="#">Terms</a> &amp; <a href="#">Privacy Policy</a></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<!-- ── SCRIPTS ─────────────────────────────────────── -->
+<script src="app.js"></script>
+</body>
+</html>

@@ -710,9 +710,124 @@ function toast(msg) {
 
 function openForm(e) {
   if(e) e.preventDefault();
-  window.location.href = '/signup.html';
+  document.getElementById('signup-overlay').style.display='flex';
 }
 
+
+function closeSignup() {
+  document.getElementById('signup-overlay').style.display = 'none';
+  document.getElementById('signup-form').style.display = 'block';
+  document.getElementById('signup-success').style.display = 'none';
+}
+
+async function submitSignup() {
+  const first  = document.getElementById('s-first').value.trim();
+  const last   = document.getElementById('s-last').value.trim();
+  const email  = document.getElementById('s-email').value.trim();
+  const company= document.getElementById('s-company').value.trim();
+  const region = document.getElementById('s-region').value;
+
+  if (!first || !email || !region) {
+    alert('Please fill in First Name, Email, and Region.');
+    return;
+  }
+
+  const btn = document.querySelector('#signup-form button');
+  btn.textContent = 'Submitting...';
+  btn.style.opacity = '.7';
+
+  const body = new FormData();
+  body.append('entry.name',   first + ' ' + last);
+  body.append('entry.email',  email);
+  body.append('entry.region', region);
+
+  try {
+    await fetch('https://docs.google.com/forms/d/e/1FAIpQLSeRFu4MwrG4UMU4J99XAVEQ5-iL4F8bwXeliF7AC_Qpv28ZYg/formResponse',
+      { method:'POST', body, mode:'no-cors' });
+  } catch(e) {}
+
+  document.getElementById('signup-form').style.display = 'none';
+  document.getElementById('signup-success').style.display = 'block';
+  document.getElementById('s-success-name').textContent = first;
+}
+
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSignup(); });
+
 </script>
+
+<!-- BRANDED SIGNUP OVERLAY -->
+<div id="signup-overlay" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(8,20,24,0.96);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeSignup()">
+  <div style="background:#0d1f24;border:1px solid rgba(0,200,200,0.24);border-radius:12px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.6)">
+
+    <!-- Header -->
+    <div style="background:#122830;padding:16px 24px;border-bottom:2px solid #00c8c8;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--t2);text-transform:uppercase;margin-bottom:2px">Private Beta · 20 Spots Only</div>
+        <div style="font-size:18px;font-weight:800;color:#fff">Freight<span style="color:#00c8c8">Signal</span> Early Access</div>
+      </div>
+      <button onclick="closeSignup()" style="background:none;border:none;color:#4a7880;font-size:22px;cursor:pointer;line-height:1;padding:4px">✕</button>
+    </div>
+
+    <!-- What you get -->
+    <div style="padding:20px 24px 0">
+      <div style="background:rgba(0,200,200,0.04);border:1px solid rgba(0,200,200,0.12);border-radius:8px;padding:14px;margin-bottom:18px">
+        <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:#00c8c8;text-transform:uppercase;margin-bottom:10px">Free for 6 months — what you get</div>
+        <div style="font-size:12px;color:#8ab8c0;display:flex;flex-direction:column;gap:6px">
+          <div>→ Real-time freight signals across your territory</div>
+          <div>→ AI-written LinkedIn outreach per signal</div>
+          <div>→ LinkedIn Auto-Pilot — sends automatically</div>
+          <div>→ Email alerts the moment a HOT signal hits</div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div id="signup-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div>
+            <label style="display:block;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">First Name *</label>
+            <input id="s-first" type="text" placeholder="John" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='#00c8c8'" onblur="this.style.borderColor='rgba(0,200,200,0.12)'">
+          </div>
+          <div>
+            <label style="display:block;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">Last Name</label>
+            <input id="s-last" type="text" placeholder="Smith" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='#00c8c8'" onblur="this.style.borderColor='rgba(0,200,200,0.12)'">
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <label style="display:block;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">Email *</label>
+          <input id="s-email" type="email" placeholder="john@yourcompany.com" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='#00c8c8'" onblur="this.style.borderColor='rgba(0,200,200,0.12)'">
+        </div>
+        <div style="margin-bottom:12px">
+          <label style="display:block;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">Company</label>
+          <input id="s-company" type="text" placeholder="Your freight company" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='#00c8c8'" onblur="this.style.borderColor='rgba(0,200,200,0.12)'">
+        </div>
+        <div style="margin-bottom:18px">
+          <label style="display:block;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">Primary Region *</label>
+          <select id="s-region" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;cursor:pointer">
+            <option value="">Select your primary region...</option>
+            <option>US Domestic</option>
+            <option>Mexico &amp; Central America</option>
+            <option>Caribbean (Puerto Rico / Dominican Republic)</option>
+            <option>South America / LATAM</option>
+            <option>Trans-Pacific (Asia → US)</option>
+            <option>Trans-Atlantic (Europe → US)</option>
+            <option>Global / Multiple Regions</option>
+          </select>
+        </div>
+        <button onclick="submitSignup()" style="width:100%;padding:14px;border-radius:8px;border:none;background:#00c8c8;color:#081418;font-family:Inter,sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:-.2px">🚀 Request My Early Access →</button>
+        <div style="text-align:center;font-family:var(--fm);font-size:9px;color:#4a7880;margin-top:10px;padding-bottom:4px;letter-spacing:.3px">No credit card · Free for 6 months · 20 spots only</div>
+      </div>
+
+      <!-- Success -->
+      <div id="signup-success" style="display:none;text-align:center;padding:30px 0 10px">
+        <div style="font-size:52px;margin-bottom:14px">📡</div>
+        <div style="font-size:24px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px;color:#fff">You're on the list, <span id="s-success-name" style="color:#00c8c8"></span>!</div>
+        <div style="font-size:13px;color:#8ab8c0;margin-bottom:20px;line-height:1.65">We'll reach out within 24 hours to get you set up.<br>Beta is limited to 20 freight sales professionals.</div>
+        <button onclick="closeSignup()" style="padding:10px 24px;border-radius:6px;background:#00c8c8;color:#081418;font-weight:700;font-size:14px;border:none;cursor:pointer">← Back to FreightSignal</button>
+      </div>
+    </div>
+    <div style="height:24px"></div>
+  </div>
+</div>
+
 </body>
 </html>

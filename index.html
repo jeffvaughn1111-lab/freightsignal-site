@@ -4,13 +4,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> FreightSignal — The Intelligence Engine for Logistics Sales</title>
+  <title>FreightSignal — The Intelligence Engine for Logistics Sales</title>
   <meta name="description" content="FreightSignal monitors 8 live news sources + 40+ local wires across your territory and automatically writes and sends your LinkedIn outreach. Freight-native AI signal intelligence.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+<!-- Hidden form for Netlify detection - do not remove -->
+<form name="freightsignal-beta" netlify data-netlify="true" hidden>
+  <input type="text" name="first-name">
+  <input type="text" name="last-name">
+  <input type="email" name="email">
+  <input type="text" name="company">
+  <select name="region"></select>
+</form>
+
 
 <!-- ── NAV ───────────────────────────────────────── -->
 <nav>
@@ -720,11 +730,10 @@ function closeSignup() {
   document.getElementById('signup-success').style.display = 'none';
 }
 
-async function submitSignup() {
+async function submitSignup(e) {
+  if(e) e.preventDefault();
   const first  = document.getElementById('s-first').value.trim();
-  const last   = document.getElementById('s-last').value.trim();
   const email  = document.getElementById('s-email').value.trim();
-  const company= document.getElementById('s-company').value.trim();
   const region = document.getElementById('s-region').value;
 
   if (!first || !email || !region) {
@@ -736,14 +745,12 @@ async function submitSignup() {
   btn.textContent = 'Submitting...';
   btn.style.opacity = '.7';
 
-  const body = new FormData();
-  body.append('entry.name',   first + ' ' + last);
-  body.append('entry.email',  email);
-  body.append('entry.region', region);
+  const form = document.getElementById('signup-form');
+  const data = new FormData(form);
 
   try {
-    await fetch('https://docs.google.com/forms/d/e/1FAIpQLSeRFu4MwrG4UMU4J99XAVEQ5-iL4F8bwXeliF7AC_Qpv28ZYg/formResponse',
-      { method:'POST', body, mode:'no-cors' });
+    await fetch('/', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body: new URLSearchParams(data).toString() });
   } catch(e) {}
 
   document.getElementById('signup-form').style.display = 'none';
@@ -781,28 +788,29 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSignup()
       </div>
 
       <!-- Form -->
-      <div id="signup-form">
+      <form id="signup-form" name="freightsignal-beta" method="POST" data-netlify="true" onsubmit="submitSignup(event)">
+<input type="hidden" name="form-name" value="freightsignal-beta">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
           <div>
             <label style="display:block;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">First Name *</label>
-            <input id="s-first" type="text" placeholder="John" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='#00c8c8'" onblur="this.style.borderColor='rgba(0,200,200,0.12)'">
+            <input id="s-first" name="first-name" type="text" placeholder="John" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='#00c8c8'" onblur="this.style.borderColor='rgba(0,200,200,0.12)'">
           </div>
           <div>
             <label style="display:block;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">Last Name</label>
-            <input id="s-last" type="text" placeholder="Smith" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='#00c8c8'" onblur="this.style.borderColor='rgba(0,200,200,0.12)'">
+            <input id="s-last" name="last-name" type="text" placeholder="Smith" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='#00c8c8'" onblur="this.style.borderColor='rgba(0,200,200,0.12)'">
           </div>
         </div>
         <div style="margin-bottom:12px">
           <label style="display:block;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">Email *</label>
-          <input id="s-email" type="email" placeholder="john@yourcompany.com" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='#00c8c8'" onblur="this.style.borderColor='rgba(0,200,200,0.12)'">
+          <input id="s-email" name="email" type="email" placeholder="john@yourcompany.com" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='#00c8c8'" onblur="this.style.borderColor='rgba(0,200,200,0.12)'">
         </div>
         <div style="margin-bottom:12px">
           <label style="display:block;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">Company</label>
-          <input id="s-company" type="text" placeholder="Your freight company" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='#00c8c8'" onblur="this.style.borderColor='rgba(0,200,200,0.12)'">
+          <input id="s-company" name="company" type="text" placeholder="Your freight company" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='#00c8c8'" onblur="this.style.borderColor='rgba(0,200,200,0.12)'">
         </div>
         <div style="margin-bottom:18px">
           <label style="display:block;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">Primary Region *</label>
-          <select id="s-region" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;cursor:pointer">
+          <select id="s-region" name="region" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:6px;color:#f0f8fa;font-family:Inter,sans-serif;font-size:14px;padding:10px 12px;outline:none;cursor:pointer">
             <option value="">Select your primary region...</option>
             <option>US Domestic</option>
             <option>Mexico &amp; Central America</option>
@@ -815,7 +823,7 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSignup()
         </div>
         <button onclick="submitSignup()" style="width:100%;padding:14px;border-radius:8px;border:none;background:#00c8c8;color:#081418;font-family:Inter,sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:-.2px">🚀 Request My Early Access →</button>
         <div style="text-align:center;font-family:var(--fm);font-size:9px;color:#4a7880;margin-top:10px;padding-bottom:4px;letter-spacing:.3px">No credit card · Free for 6 months · 20 spots only</div>
-      </div>
+      </form>
 
       <!-- Success -->
       <div id="signup-success" style="display:none;text-align:center;padding:30px 0 10px">

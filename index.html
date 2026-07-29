@@ -162,16 +162,17 @@ nav {
   pointer-events: none;
 }
 .hero-eye {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-family: var(--fm); font-size: 9px; letter-spacing: 2.5px;
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: var(--fm); font-size: 13px; letter-spacing: 2px;
   color: var(--teal);
-  border: 1px solid var(--border2); border-radius: 3px;
-  padding: 5px 14px; margin-bottom: 28px;
-  background: rgba(0,200,200,.04);
+  border: 2px solid rgba(0,200,200,0.4); border-radius: 4px;
+  padding: 12px 24px; margin-bottom: 32px;
+  background: rgba(0,200,200,0.06);
 }
 .hero-eye .dot {
-  width: 6px; height: 6px; border-radius: 50%;
+  width: 10px; height: 10px; border-radius: 50%;
   background: var(--teal);
+  box-shadow: 0 0 10px rgba(0,200,200,0.7);
   animation: blink 1.4s ease-in-out infinite;
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
@@ -667,9 +668,9 @@ footer img { height: 44px; width: auto; }
       <line x1="22" y1="22" x2="27" y2="22" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
       <circle cx="27" cy="22" r="1.5" fill="#00C8C8"/>
     </svg>
-    <div style="display:flex;flex-direction:column;line-height:1">
-      <span style="font-family:'Inter',sans-serif;font-size:32px;font-weight:900;letter-spacing:-1px;color:#ffffff">Freight<span style="color:#00C8C8">Signal</span></span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2.5px;color:#4a7880;margin-top:3px">FREIGHT SALES INTELLIGENCE</span>
+    <div style="display:flex;flex-direction:column;line-height:1.2">
+      <span style="font-family:'Inter',sans-serif;font-size:30px;font-weight:900;letter-spacing:-1px;color:#ffffff">Freight<span style="color:#00C8C8">Signal</span></span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:3px;color:#7fe8e8;margin-top:8px;display:block">FREIGHT SALES INTELLIGENCE</span>
     </div>
   </a>
   <div class="nav-links">
@@ -723,7 +724,7 @@ footer img { height: 44px; width: auto; }
 <!-- ── HERO ──────────────────────────────────────── -->
 <section class="hero">
   <div class="hero-glow"></div>
-  <div class="hero-eye"><div class="dot"></div>REAL-TIME FREIGHT SALES INTELLIGENCE &amp; AI OUTREACH</div>
+  <div class="hero-eye"><div class="dot"></div>FREIGHT SALES INTELLIGENCE &nbsp;·&nbsp; AI-POWERED LEAD GENERATION</div>
   <h1>
     <span class="line1">YOUR NEXT ACCOUNT</span>
     <span class="line2">JUST MADE THE NEWS</span>

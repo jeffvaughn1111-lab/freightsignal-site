@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreightSignal — Territory Intelligence Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060e12;--surf:#0a1a20;--surf2:#0f2530;--surf3:#142e38;
+  --teal:#00c8c8;--teal2:#009898;--teal3:#28e0e0;--teal4:rgba(0,200,200,0.08);
+  --t1:#e8f4f6;--t2:#7ab0b8;--t3:#3d6870;
+  --border:rgba(0,200,200,0.08);--border2:rgba(0,200,200,0.22);--border3:rgba(0,200,200,0.4);
+  --red:#ef4444;--amber:#f59e0b;--blue:#3b82f6;--purple:#8b5cf6;--green:#10b981;
+  --ff:"Inter",sans-serif;--fm:"JetBrains Mono",monospace;
+  --glow:0 0 20px rgba(0,200,200,0.15);
+}
+html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--t1);overflow:hidden}
+
+/* ── SCAN LINE ANIMATION ─────────────────────────── */
+body::before{
+  content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,200,200,0.015) 2px,rgba(0,200,200,0.015) 4px);
+  animation:scanlines 8s linear infinite;
+}
+@keyframes scanlines{0%{background-position:0 0}100%{background-position:0 100px}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+@keyframes pulse-ring{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.5);opacity:0}}
+@keyframes data-flow{0%{stroke-dashoffset:20}100%{stroke-dashoffset:0}}
+@keyframes glow-pulse{0%,100%{box-shadow:0 0 8px rgba(0,200,200,0.3)}50%{box-shadow:0 0 20px rgba(0,200,200,0.6)}}
+
+/* ── LAYOUT ─────────────────────────────────────── */
+.app{display:grid;grid-template-rows:58px 40px 1fr;grid-template-columns:300px 1fr;height:100vh;gap:0}
+
+/* ── TOPBAR ─────────────────────────────────────── */
+.topbar{
+  grid-column:1/-1;
+  background:linear-gradient(90deg,#040c0f,#060e12,#040c0f);
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;gap:14px;padding:0 16px;
+  position:relative;z-index:200;
+}
+.topbar::after{
+  content:"";position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--teal),transparent);
+}
+.brand{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-right:8px}
+.brand-icon{width:32px;height:32px}
+.brand-name{font-size:18px;font-weight:900;letter-spacing:-.5px;line-height:1}
+.brand-name em{color:var(--teal);font-style:normal}
+.brand-sub{font-family:var(--fm);font-size:7px;letter-spacing:2.5px;color:var(--t3);display:block;margin-top:2px}
+.topbar-div{width:1px;height:28px;background:var(--border2);flex-shrink:0}
+
+/* Trip planner */
+.trip-wrap{display:flex;align-items:center;gap:6px}
+.trip-lbl{font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:var(--t3);white-space:nowrap}
+.trip-input{
+  background:var(--surf2);border:1px solid var(--border2);border-radius:4px;
+  color:var(--t1);font-family:var(--ff);font-size:12px;padding:5px 10px;outline:none;
+  width:160px;transition:all .2s;
+}
+.trip-input:focus{border-color:var(--teal);box-shadow:var(--glow)}
+.trip-input::placeholder{color:var(--t3)}
+.radius-sel{
+  background:var(--surf2);border:1px solid var(--border2);border-radius:4px;
+  color:var(--t1);font-family:var(--fm);font-size:10px;padding:5px 8px;outline:none;cursor:pointer;
+}
+.radius-sel option{background:var(--surf2)}
+.btn-find{
+  background:linear-gradient(135deg,var(--teal2),var(--teal));
+  border:none;border-radius:4px;color:var(--bg);
+  font-family:var(--fm);font-weight:700;font-size:10px;letter-spacing:.5px;
+  padding:6px 14px;cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.btn-find:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,200,200,0.3)}
+
+/* Stat chips */
+.topbar-stats{margin-left:auto;display:flex;gap:6px;align-items:center}
+.stat-chip{
+  font-family:var(--fm);font-size:8px;letter-spacing:.5px;
+  padding:4px 10px;border-radius:3px;
+  border:1px solid var(--border2);background:var(--teal4);
+  color:var(--t2);white-space:nowrap;
+}
+.stat-chip strong{color:var(--teal)}
+.btn-sm{
+  font-family:var(--fm);font-size:9px;letter-spacing:.5px;
+  padding:5px 10px;border-radius:3px;
+  border:1px solid var(--border2);background:transparent;
+  color:var(--t2);cursor:pointer;transition:all .15s;
+}
+.btn-sm:hover{border-color:var(--teal);color:var(--teal)}
+.btn-trip{background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(139,92,246,.05));border-color:rgba(139,92,246,.4);color:#a78bfa}
+.btn-trip:hover{border-color:#8b5cf6;color:#c4b5fd;box-shadow:0 0 12px rgba(139,92,246,.2)}
+
+/* ── TOOLBAR ─────────────────────────────────────── */
+.toolbar{
+  grid-column:1/-1;
+  background:var(--surf);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:6px;padding:0 14px;
+  position:relative;z-index:199;
+}
+.tool-label{font-family:var(--fm);font-size:7px;letter-spacing:2px;color:var(--t3);text-transform:uppercase;white-space:nowrap;margin-right:4px}
+.layer-btn{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--fm);font-size:8px;letter-spacing:.5px;
+  padding:4px 10px;border-radius:3px;
+  border:1px solid var(--border2);background:transparent;
+  cursor:pointer;transition:all .12s;color:var(--t2);white-space:nowrap;
+}
+.layer-btn .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.layer-btn.on{font-weight:700}
+.tool-div{width:1px;height:20px;background:var(--border);margin:0 4px;flex-shrink:0}
+.import-btn{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--fm);font-size:8px;letter-spacing:.5px;
+  padding:4px 10px;border-radius:3px;
+  border:1px dashed var(--border2);background:transparent;
+  cursor:pointer;transition:all .15s;color:var(--t3);white-space:nowrap;
+}
+.import-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal4)}
+
+/* ── SIDEBAR ─────────────────────────────────────── */
+.sidebar{
+  background:var(--surf);
+  border-right:1px solid var(--border2);
+  overflow-y:auto;display:flex;flex-direction:column;
+  position:relative;
+}
+.sidebar::before{
+  content:"";position:absolute;top:0;right:0;width:1px;height:100%;
+  background:linear-gradient(180deg,transparent,var(--teal),transparent);
+  opacity:.3;
+}
+
+/* Alert tabs */
+.alert-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.alert-tab{
+  flex:1;padding:8px 4px;text-align:center;cursor:pointer;
+  font-family:var(--fm);font-size:8px;letter-spacing:1px;color:var(--t3);
+  border-bottom:2px solid transparent;transition:all .15s;
+}
+.alert-tab.active{color:var(--teal);border-bottom-color:var(--teal);background:var(--teal4)}
+.alert-tab .badge{
+  display:inline-block;background:var(--teal);color:var(--bg);
+  font-size:7px;font-weight:700;padding:1px 5px;border-radius:10px;margin-left:4px;
+  vertical-align:middle;
+}
+.alert-tab .badge.amber{background:var(--amber)}
+.alert-tab .badge.blue{background:var(--blue)}
+
+/* Contact list */
+.contact-list{flex:1;overflow-y:auto;padding:6px}
+.contact-card{
+  background:var(--surf2);border:1px solid var(--border);border-radius:6px;
+  padding:9px 11px;margin-bottom:5px;cursor:pointer;transition:all .15s;
+  position:relative;overflow:hidden;
+}
+.contact-card::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:var(--card-color,var(--teal));
+}
+.contact-card:hover{border-color:var(--border2);background:var(--surf3);transform:translateX(2px)}
+.contact-card.active{border-color:var(--border3);background:var(--surf3)}
+.cc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:3px}
+.cc-name{font-size:11px;font-weight:600;color:var(--t1)}
+.cc-badge{font-family:var(--fm);font-size:7px;padding:2px 5px;border-radius:2px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.cc-meta{font-size:10px;color:var(--t2);margin-bottom:2px}
+.cc-addr{font-family:var(--fm);font-size:9px;color:var(--t3);margin-top:3px;display:flex;align-items:center;gap:4px}
+.cc-score{font-family:var(--fm);font-size:11px;font-weight:700}
+
+/* Alert cards */
+.alert-card{
+  background:var(--surf2);border:1px solid var(--border);border-radius:6px;
+  padding:10px 12px;margin-bottom:5px;cursor:pointer;transition:all .15s;
+}
+.alert-card:hover{border-color:var(--border2)}
+.alert-card-head{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.alert-icon{width:28px;height:28px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.alert-title{font-size:11px;font-weight:600;color:var(--t1);line-height:1.3}
+.alert-meta{font-family:var(--fm);font-size:9px;color:var(--t3);margin-top:2px}
+.alert-tag{font-family:var(--fm);font-size:7px;padding:2px 6px;border-radius:2px;font-weight:700;display:inline-block;margin-top:5px}
+
+/* Tools section */
+.tool-section{padding:10px 12px;border-top:1px solid var(--border)}
+.tool-section-title{font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--t3);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.tool-section-title::after{content:"";flex:1;height:1px;background:var(--border)}
+.tool-input{
+  width:100%;background:var(--surf3);border:1px solid var(--border);border-radius:4px;
+  color:var(--t1);font-family:var(--ff);font-size:12px;padding:8px 10px;outline:none;
+  transition:all .15s;margin-bottom:6px;
+}
+.tool-input:focus{border-color:var(--teal);box-shadow:0 0 0 2px rgba(0,200,200,0.08)}
+.tool-input::placeholder{color:var(--t3)}
+.tool-btn{
+  width:100%;padding:8px;border-radius:4px;border:none;
+  background:linear-gradient(135deg,var(--teal2),var(--teal));
+  color:var(--bg);font-family:var(--fm);font-size:9px;font-weight:700;
+  letter-spacing:.5px;cursor:pointer;transition:all .2s;
+}
+.tool-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,200,200,0.25)}
+.tool-result{
+  background:var(--surf3);border:1px solid var(--border2);border-radius:4px;
+  padding:10px;font-size:11px;color:var(--t2);line-height:1.6;margin-top:6px;display:none;
+}
+.tool-result strong{color:var(--teal)}
+
+/* ── MAP ─────────────────────────────────────────── */
+.map-wrap{position:relative;z-index:1;overflow:hidden}
+#map{height:100%;width:100%;background:var(--bg)}
+
+/* Dark military-style map tiles */
+.leaflet-tile-pane{
+  filter: brightness(0.85) contrast(1.1);
+}
+.leaflet-container{background:#060e12}
+
+/* Grid overlay on map */
+.map-grid-overlay{
+  position:absolute;inset:0;z-index:400;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,200,200,0.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,200,200,0.04) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+
+/* Coordinate display */
+.map-coords{
+  position:absolute;bottom:10px;left:310px;z-index:500;
+  font-family:var(--fm);font-size:9px;color:var(--teal);letter-spacing:1px;
+  background:rgba(6,14,18,0.85);border:1px solid var(--border2);
+  border-radius:3px;padding:4px 10px;
+  text-shadow:0 0 8px rgba(0,200,200,0.5);
+}
+
+/* Signal pulse rings */
+.signal-pulse{
+  position:relative;
+}
+.signal-pulse::before{
+  content:"";position:absolute;
+  width:20px;height:20px;border-radius:50%;
+  border:1px solid var(--teal);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  animation:pulse-ring 2s ease-out infinite;
+}
+
+/* ── POPUP ───────────────────────────────────────── */
+.leaflet-popup-content-wrapper{
+  background:var(--surf2)!important;
+  border:1px solid var(--border2)!important;
+  border-radius:8px!important;
+  box-shadow:0 8px 32px rgba(0,0,0,0.8),0 0 20px rgba(0,200,200,0.1)!important;
+  padding:0!important;
+}
+.leaflet-popup-tip{background:var(--surf2)!important}
+.leaflet-popup-content{margin:0!important;color:var(--t1)!important;font-family:var(--ff)!important;min-width:240px}
+.fs-popup{padding:14px}
+.fs-popup-badge{display:inline-block;font-family:var(--fm);font-size:7px;letter-spacing:1px;padding:2px 7px;border-radius:2px;font-weight:700;margin-bottom:8px}
+.fs-popup-title{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:6px;line-height:1.3}
+.fs-popup-grid{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:10px;margin-bottom:8px}
+.fs-popup-lbl{color:var(--t3);font-family:var(--fm);font-size:9px;white-space:nowrap}
+.fs-popup-val{color:var(--t2)}
+.fs-popup-angle{background:var(--surf3);border-radius:4px;padding:8px;font-size:10px;color:var(--t2);line-height:1.5;margin-bottom:8px}
+.fs-popup-angle strong{color:var(--teal);display:block;margin-bottom:3px;font-family:var(--fm);font-size:8px;letter-spacing:1px}
+.fs-popup-btns{display:flex;gap:5px;flex-wrap:wrap}
+.fs-popup-btn{padding:5px 10px;border-radius:3px;font-family:var(--fm);font-size:8px;font-weight:700;border:none;cursor:pointer;letter-spacing:.3px;transition:all .15s}
+.popup-btn-teal{background:var(--teal);color:var(--bg)}
+.popup-btn-teal:hover{background:var(--teal3)}
+.popup-btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--t2)}
+.popup-btn-ghost:hover{border-color:var(--teal);color:var(--teal)}
+.popup-btn-maps{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#60a5fa}
+
+/* ── TRIP MODAL ──────────────────────────────────── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(4,10,13,0.92);backdrop-filter:blur(12px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--surf);border:1px solid var(--border2);border-radius:10px;
+  width:100%;max-width:620px;max-height:90vh;overflow-y:auto;
+  box-shadow:0 40px 100px rgba(0,0,0,0.8),var(--glow);
+  position:relative;
+}
+.modal-head{
+  background:var(--surf2);padding:14px 20px;
+  border-bottom:2px solid var(--teal);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:1;
+}
+.modal-title{font-size:16px;font-weight:800;color:var(--t1)}
+.modal-sub{font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:var(--t3);margin-top:2px}
+.modal-close{background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer;line-height:1;padding:2px}
+.modal-close:hover{color:var(--t1)}
+.modal-body{padding:18px 20px}
+.form-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.form-group{margin-bottom:12px}
+.form-label{display:block;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:var(--t3);text-transform:uppercase;margin-bottom:5px}
+.form-control{
+  width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:4px;
+  color:var(--t1);font-family:var(--ff);font-size:13px;padding:9px 12px;outline:none;
+  transition:all .15s;
+}
+.form-control:focus{border-color:var(--teal);box-shadow:0 0 0 2px rgba(0,200,200,0.08)}
+.form-control::placeholder{color:var(--t3)}
+.form-control option{background:var(--surf2)}
+.tone-row{display:flex;gap:6px;margin-bottom:14px}
+.tone-btn{
+  flex:1;padding:7px;border-radius:4px;border:1px solid var(--border2);
+  background:transparent;color:var(--t3);font-family:var(--fm);font-size:8px;
+  cursor:pointer;transition:all .15s;letter-spacing:.5px;text-align:center;
+}
+.tone-btn.on{background:var(--teal4);border-color:var(--teal);color:var(--teal);font-weight:700}
+.generate-btn{
+  width:100%;padding:12px;border-radius:6px;border:none;
+  background:linear-gradient(135deg,var(--teal2),var(--teal));
+  color:var(--bg);font-family:var(--fm);font-size:11px;font-weight:700;
+  letter-spacing:.5px;cursor:pointer;margin-bottom:14px;transition:all .2s;
+}
+.generate-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,200,200,0.3)}
+.outreach-card{background:var(--surf2);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:8px}
+.outreach-card-name{font-size:12px;font-weight:700;color:var(--t1);margin-bottom:3px}
+.outreach-card-meta{font-size:10px;color:var(--t2);margin-bottom:8px}
+.msg-box{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:9px;font-size:10px;color:var(--t2);line-height:1.65;white-space:pre-wrap;margin-bottom:6px}
+.copy-row{display:flex;gap:5px}
+.copy-btn{padding:5px 11px;border-radius:3px;font-family:var(--fm);font-size:8px;font-weight:700;border:none;cursor:pointer;transition:all .15s;letter-spacing:.3px}
+.copy-teal{background:var(--teal);color:var(--bg)}
+.copy-ghost{background:transparent;border:1px solid var(--border2);color:var(--t2)}
+.copy-ghost:hover{border-color:var(--teal);color:var(--teal)}
+.export-all-btn{
+  width:100%;margin-top:10px;padding:9px;border-radius:4px;
+  border:1px solid var(--border2);background:transparent;
+  color:var(--t2);font-family:var(--fm);font-size:9px;cursor:pointer;
+  transition:all .15s;letter-spacing:.5px;
+}
+.export-all-btn:hover{border-color:var(--teal);color:var(--teal)}
+
+/* Empty state */
+.empty-state{padding:24px 14px;text-align:center;color:var(--t3);font-size:11px;line-height:1.7}
+.empty-icon{font-size:32px;margin-bottom:10px;display:block;opacity:.5}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:16px;right:16px;z-index:99999;
+  background:var(--surf2);border:1px solid var(--border2);border-radius:5px;
+  padding:9px 16px;font-family:var(--fm);font-size:10px;color:var(--teal);
+  display:none;box-shadow:var(--glow);letter-spacing:.3px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--surf)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--teal2)}
+
+/* Print */
+@media print{
+  .sidebar,.topbar,.toolbar,.modal-overlay{display:none!important}
+  .app{grid-template-rows:1fr;grid-template-columns:1fr}
+  .map-wrap{height:100vh}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ── TOPBAR ─────────────────────────────────────── -->
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-icon" viewBox="0 0 44 44" fill="none">
+      <path d="M22 2C14.268 2 8 8.268 8 16c0 10 14 26 14 26s14-16 14-26C36 8.268 29.732 2 22 2z" fill="none" stroke="#00C8C8" stroke-width="2"/>
+      <circle cx="22" cy="16" r="2" fill="#00C8C8"/>
+      <line x1="22" y1="14" x2="22" y2="10" stroke="#00C8C8" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="22" y1="10" x2="17" y2="10" stroke="#00C8C8" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="17" cy="10" r="1.4" fill="#00C8C8"/>
+      <line x1="22" y1="10" x2="27" y2="10" stroke="#00C8C8" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="27" cy="10" r="1.4" fill="#00C8C8"/>
+      <line x1="22" y1="18" x2="22" y2="22" stroke="#00C8C8" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="22" y1="22" x2="17" y2="22" stroke="#00C8C8" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="17" cy="22" r="1.4" fill="#00C8C8"/>
+      <line x1="22" y1="22" x2="27" y2="22" stroke="#00C8C8" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="27" cy="22" r="1.4" fill="#00C8C8"/>
+    </svg>
+    <div>
+      <div class="brand-name">Freight<em>Signal</em></div>
+      <span class="brand-sub">TERRITORY INTELLIGENCE MAP</span>
+    </div>
+  </div>
+
+  <div class="topbar-div"></div>
+
+  <div class="trip-wrap">
+    <span class="trip-lbl">TRIP TO</span>
+    <input class="trip-input" id="tripCity" placeholder="Dallas, TX" onkeydown="if(event.key==='Enter')findCity()">
+    <select class="radius-sel" id="radiusMiles" onchange="updateRadius()">
+      <option value="25">25 mi</option>
+      <option value="50" selected>50 mi</option>
+      <option value="100">100 mi</option>
+      <option value="200">200 mi</option>
+    </select>
+    <button class="btn-find" onclick="findCity()">⊕ FIND</button>
+  </div>
+
+  <div class="topbar-stats">
+    <div class="stat-chip">Contacts <strong id="statContacts">0</strong></div>
+    <div class="stat-chip">Signals <strong id="statSignals">0</strong></div>
+    <div class="stat-chip">Radius <strong id="statRadius">—</strong></div>
+    <button class="btn-sm" onclick="exportVisible()">⬇ CSV</button>
+    <button class="btn-sm" onclick="window.print()">⊞ PRINT</button>
+    <button class="btn-sm btn-trip" onclick="openTripModal()">✈ TRIP OUTREACH</button>
+  </div>
+</header>
+
+<!-- ── TOOLBAR ─────────────────────────────────────── -->
+<div class="toolbar">
+  <span class="tool-label">LAYERS</span>
+  <button class="layer-btn on" id="lb-pipeline" onclick="toggleLayer('pipeline',this)" style="--c:#ef4444">
+    <div class="dot" style="background:#ef4444"></div>PIPELINE
+  </button>
+  <button class="layer-btn on" id="lb-linkedin" onclick="toggleLayer('linkedin',this)" style="--c:#3b82f6">
+    <div class="dot" style="background:#3b82f6"></div>LINKEDIN
+  </button>
+  <button class="layer-btn on" id="lb-signal" onclick="toggleLayer('signal',this)" style="--c:#00c8c8">
+    <div class="dot" style="background:#00c8c8"></div>SIGNALS
+  </button>
+  <button class="layer-btn on" id="lb-import" onclick="toggleLayer('import',this)" style="--c:#8b5cf6">
+    <div class="dot" style="background:#8b5cf6"></div>IMPORT-EXPORT
+  </button>
+  <div class="tool-div"></div>
+  <span class="tool-label">IMPORT</span>
+  <button class="import-btn" onclick="document.getElementById('csvLinkedIn').click()">⊕ LinkedIn CSV</button>
+  <button class="import-btn" onclick="document.getElementById('csvPipeline').click()">⊕ Pipeline / CRM</button>
+  <button class="import-btn" onclick="document.getElementById('csvImport').click()">⊕ Import-Export / Customs</button>
+  <button class="import-btn" onclick="document.getElementById('csvIphone').click()">⊕ iPhone / Outlook</button>
+  <input type="file" id="csvLinkedIn" accept=".csv" style="display:none" onchange="loadCSV(this,'linkedin')">
+  <input type="file" id="csvPipeline" accept=".csv" style="display:none" onchange="loadCSV(this,'pipeline')">
+  <input type="file" id="csvImport" accept=".csv" style="display:none" onchange="loadCSV(this,'import')">
+  <input type="file" id="csvIphone" accept=".csv,.vcf" style="display:none" onchange="loadCSV(this,'linkedin')">
+</div>
+
+<!-- ── SIDEBAR ─────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="alert-tabs">
+    <div class="alert-tab active" onclick="switchTab('contacts',this)">CONTACTS<span class="badge" id="tab-contacts-badge">0</span></div>
+    <div class="alert-tab" onclick="switchTab('alerts',this)">ALERTS<span class="badge amber" id="tab-alerts-badge">3</span></div>
+    <div class="alert-tab" onclick="switchTab('tools',this)">TOOLS<span class="badge blue">4</span></div>
+  </div>
+
+  <!-- CONTACTS TAB -->
+  <div id="tab-contacts" class="contact-list"></div>
+
+  <!-- ALERTS TAB -->
+  <div id="tab-alerts" style="display:none;padding:8px;overflow-y:auto;flex:1">
+
+    <div class="alert-card" onclick="map.setView([25.7617,-80.1918],10)">
+      <div class="alert-card-head">
+        <div class="alert-icon" style="background:rgba(239,68,68,0.15)">🌀</div>
+        <div>
+          <div class="alert-title">Tropical Storm Warning</div>
+          <div class="alert-meta">Caribbean Basin · Updated 2 hrs ago</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--t2);line-height:1.5">Path projected toward Jamaica and eastern Cuba. Puerto Caucedo and Kingston ports may see delays 72–96 hrs.</div>
+      <span class="alert-tag" style="background:rgba(239,68,68,0.12);color:#ef4444">⚠ PORT DISRUPTION RISK</span>
+    </div>
+
+    <div class="alert-card">
+      <div class="alert-card-head">
+        <div class="alert-icon" style="background:rgba(59,130,246,0.15)">✈️</div>
+        <div>
+          <div class="alert-title">Carlos Mejía is in Miami</div>
+          <div class="alert-meta">Boston Scientific CR · Posted 3 hrs ago</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--t2);line-height:1.5">"Great meetings in Miami this week — supply chain planning for Q4" · Soft touch opportunity while he's in your market.</div>
+      <span class="alert-tag" style="background:rgba(0,200,200,0.1);color:var(--teal)">📍 IN YOUR MARKET</span>
+    </div>
+
+    <div class="alert-card">
+      <div class="alert-card-head">
+        <div class="alert-icon" style="background:rgba(139,92,246,0.15)">🏭</div>
+        <div>
+          <div class="alert-title">Walmart Puerto Rico posted: 3 new stores</div>
+          <div class="alert-meta">LinkedIn Company Page · 6 hrs ago</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--t2);line-height:1.5">Walmart PR announced 3 new Bodega Aurrerá locations opening Q1 2027 — initial inventory fill + ongoing replenishment opportunity.</div>
+      <span class="alert-tag" style="background:rgba(139,92,246,0.12);color:#a78bfa">📡 COMPANY PAGE SIGNAL · 78/100</span>
+    </div>
+
+    <div style="font-family:var(--fm);font-size:8px;color:var(--t3);text-align:center;padding:12px;letter-spacing:.5px">
+      Weather · LinkedIn travel · Company page alerts stay here<br>Only HOT signals go to your email digest
+    </div>
+  </div>
+
+  <!-- TOOLS TAB -->
+  <div id="tab-tools" style="display:none;overflow-y:auto;flex:1">
+
+    <!-- HS Code Lookup -->
+    <div class="tool-section">
+      <div class="tool-section-title">HS CODE LOOKUP</div>
+      <input class="tool-input" id="hs-query" placeholder="e.g. medical devices, apparel, cookware..." onkeydown="if(event.key==='Enter')lookupHS()">
+      <button class="tool-btn" onclick="lookupHS()">🔍 FIND HS CODE + DUTY RATE</button>
+      <div class="tool-result" id="hs-result"></div>
+    </div>
+
+    <!-- FTA Checker -->
+    <div class="tool-section">
+      <div class="tool-section-title">CAFTA / USMCA FTA CHECKER</div>
+      <input class="tool-input" id="fta-product" placeholder="Product (e.g. cotton t-shirts)">
+      <input class="tool-input" id="fta-origin" placeholder="Origin country (e.g. Honduras)">
+      <input class="tool-input" id="fta-dest" placeholder="Destination (e.g. United States)">
+      <button class="tool-btn" onclick="checkFTA()">✓ CHECK FREE TRADE AGREEMENT</button>
+      <div class="tool-result" id="fta-result"></div>
+    </div>
+
+    <!-- Country Import Requirements -->
+    <div class="tool-section">
+      <div class="tool-section-title">COUNTRY IMPORT REQUIREMENTS</div>
+      <input class="tool-input" id="imp-product" placeholder="Product (e.g. pharmaceuticals)">
+      <input class="tool-input" id="imp-country" placeholder="Destination country (e.g. Costa Rica)">
+      <button class="tool-btn" onclick="checkImportReqs()">📋 GET IMPORT REQUIREMENTS</button>
+      <div class="tool-result" id="imp-result"></div>
+    </div>
+
+    <!-- Incoterms -->
+    <div class="tool-section">
+      <div class="tool-section-title">INCOTERMS EXPLAINER</div>
+      <select class="tool-input" id="inco-term" style="cursor:pointer">
+        <option value="">Select Incoterm...</option>
+        <option>EXW — Ex Works</option>
+        <option>FOB — Free On Board</option>
+        <option>CIF — Cost Insurance Freight</option>
+        <option>DDP — Delivered Duty Paid</option>
+        <option>DAP — Delivered At Place</option>
+        <option>FCA — Free Carrier</option>
+        <option>CFR — Cost and Freight</option>
+        <option>CPT — Carriage Paid To</option>
+      </select>
+      <button class="tool-btn" onclick="explainIncoterm()">📖 EXPLAIN THIS INCOTERM</button>
+      <div class="tool-result" id="inco-result"></div>
+    </div>
+
+  </div>
+</aside>
+
+<!-- ── MAP ─────────────────────────────────────────── -->
+<main class="map-wrap">
+  <div id="map"></div>
+  <div class="map-grid-overlay"></div>
+  <div class="map-coords" id="mapCoords">LAT — · LON —</div>
+</main>
+
+</div>
+
+<!-- ── TRIP OUTREACH MODAL ────────────────────────── -->
+<div class="modal-overlay" id="tripModal" onclick="if(event.target===this)closeTripModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">✈ Trip Outreach Generator</div>
+        <div class="modal-sub">AI WRITES LINKEDIN + EMAIL FOR EVERY CONTACT IN RADIUS</div>
+      </div>
+      <button class="modal-close" onclick="closeTripModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Trip City</label>
+          <input class="form-control" id="tm-city" placeholder="Dallas, TX">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Visit Date</label>
+          <input class="form-control" id="tm-date" placeholder="September 7th">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Radius</label>
+          <select class="form-control" id="tm-radius">
+            <option value="25">25 miles</option>
+            <option value="50" selected>50 miles</option>
+            <option value="100">100 miles</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input class="form-control" id="tm-name" value="Jeff Vaughn">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Company & Title</label>
+          <input class="form-control" id="tm-company" value="CBX Global · SVP Business Development">
+        </div>
+      </div>
+      <label class="form-label">Message Tone</label>
+      <div class="tone-row">
+        <button class="tone-btn on" id="tone-warm" onclick="setTone('warm',this)">😊 Warm & Personal</button>
+        <button class="tone-btn" id="tone-pro" onclick="setTone('professional',this)">💼 Professional</button>
+        <button class="tone-btn" id="tone-brief" onclick="setTone('brief',this)">⚡ Short & Direct</button>
+      </div>
+      <button class="generate-btn" id="tm-gen-btn" onclick="generateTripOutreach()">
+        🤖 GENERATE OUTREACH FOR ALL CONTACTS IN RADIUS
+      </button>
+      <div id="tm-results" style="display:none">
+        <div style="font-family:var(--fm);font-size:8px;color:var(--teal);letter-spacing:1.5px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)" id="tm-results-hdr"></div>
+        <div id="tm-cards"></div>
+        <button class="export-all-btn" onclick="exportTripOutreach()">⬇ EXPORT ALL AS CSV</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── COLORS & CONFIG ───────────────────────────────────────────────────────
+const COLORS = { pipeline:'#ef4444', linkedin:'#3b82f6', signal:'#00C8C8', warm:'#f59e0b', import:'#8b5cf6' };
+function typeColor(c) { return c.type==='signal' ? (c.tier==='HOT'?COLORS.signal:COLORS.warm) : COLORS[c.type]||COLORS.linkedin; }
+
+// ── MAP INIT ──────────────────────────────────────────────────────────────
+const map = L.map('map',{zoomControl:true,preferCanvas:true}).setView([18,-75],4);
+// Try CartoDB dark tiles first — best for dark UI
+const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© OpenStreetMap © CARTO',
+  subdomains: 'abcd',
+  maxZoom: 19
+});
+tiles.addTo(map);
+
+// If CartoDB fails, fallback to OSM with dark filter
+tiles.on('tileerror', function() {
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap', maxZoom: 19
+  }).addTo(map);
+});
+
+// Coordinate display
+map.on('mousemove', e => {
+  document.getElementById('mapCoords').textContent =
+    `LAT ${e.latlng.lat.toFixed(4)} · LON ${e.latlng.lng.toFixed(4)}`;
+});
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let contacts=[],markers={},radiusCircle=null,radiusCenter=null;
+let layerVisible={pipeline:true,linkedin:true,signal:true,import:true};
+let currentTone='warm',tripOutreachData=[];
+
+// ── ICON MAKER ────────────────────────────────────────────────────────────
+function makeIcon(color,size=10,pulse=false) {
+  const ring = pulse ? `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:${size*2.5}px;height:${size*2.5}px;border-radius:50%;border:1px solid ${color};animation:pulse-ring 2s ease-out infinite;"></div>` : '';
+  return L.divIcon({
+    className:'',
+    html:`<div style="position:relative;display:flex;align-items:center;justify-content:center;">${ring}<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,0.5);box-shadow:0 0 8px ${color}99;position:relative;z-index:1"></div></div>`,
+    iconSize:[size*3,size*3],iconAnchor:[size*1.5,size*1.5]
+  });
+}
+
+// ── GEOCODE ───────────────────────────────────────────────────────────────
+async function geocode(q) {
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`,{headers:{'Accept-Language':'en'}});
+    const d = await r.json();
+    if(d.length) return {lat:+d[0].lat,lng:+d[0].lon};
+  } catch(e){}
+  return null;
+}
+
+// ── FIND CITY ─────────────────────────────────────────────────────────────
+async function findCity() {
+  const city = document.getElementById('tripCity').value.trim();
+  if(!city) return;
+  toast('Locating '+city+'...');
+  const geo = await geocode(city);
+  if(!geo){toast('City not found');return;}
+  const miles = +document.getElementById('radiusMiles').value;
+  const meters = miles*1609.34;
+  map.setView([geo.lat,geo.lng], miles<=25?11:miles<=50?10:miles<=100?9:7);
+  if(radiusCircle) radiusCircle.remove();
+  radiusCircle = L.circle([geo.lat,geo.lng],{
+    radius:meters,color:'#00C8C8',weight:1,opacity:.5,
+    fillColor:'#00C8C8',fillOpacity:.03,dashArray:'4 8'
+  }).addTo(map);
+  radiusCenter = L.latLng(geo.lat,geo.lng);
+  L.marker([geo.lat,geo.lng],{icon:L.divIcon({className:'',html:'<div style="font-size:20px;filter:drop-shadow(0 0 6px #00C8C8)">⊕</div>',iconSize:[24,24],iconAnchor:[12,12]})}).addTo(map);
+  updateRadiusFilter();
+  toast(`✓ ${city} · ${miles}mi radius`);
+}
+
+function updateRadius() { if(radiusCenter&&radiusCircle){radiusCircle.setRadius(+document.getElementById('radiusMiles').value*1609.34);updateRadiusFilter();} }
+
+function updateRadiusFilter() {
+  if(!radiusCenter) return;
+  const meters = +document.getElementById('radiusMiles').value*1609.34;
+  let count=0;
+  contacts.forEach(c=>{
+    if(c.lat&&c.lng){c.inRadius=radiusCenter.distanceTo(L.latLng(c.lat,c.lng))<=meters;if(c.inRadius)count++;}
+  });
+  document.getElementById('statRadius').textContent=count;
+  renderList();
+}
+
+// ── ADD MARKER ────────────────────────────────────────────────────────────
+function addMarker(c) {
+  if(!c.lat||!c.lng) return;
+  const color=typeColor(c), isPulse=c.type==='signal'&&c.tier==='HOT';
+  const m=L.marker([c.lat,c.lng],{icon:makeIcon(color,c.type==='signal'?7:5,isPulse)});
+  const addr = c.address&&c.address!==c.city ? `<div class="fs-popup-grid"><span class="fs-popup-lbl">ADDRESS</span><span class="fs-popup-val">${c.address}</span></div>` : '';
+  const mapsBtn = c.address||c.city ? `<button class="fs-popup-btn popup-btn-maps" onclick="window.open('https://maps.google.com/?q=${encodeURIComponent(c.address||c.city)}','_blank')">🗺 Google Maps</button>` : '';
+  const angle = c.freight_angle ? `<div class="fs-popup-angle"><strong>📦 FREIGHT ANGLE</strong>${c.freight_angle}</div>` : '';
+  const liBtn = c.li_message ? `<button class="fs-popup-btn popup-btn-ghost" onclick="copyToClip('${c.id}','li')">💼 Copy LinkedIn</button>` : '';
+  m.bindPopup(`<div class="fs-popup">
+    <span class="fs-popup-badge" style="background:${color}22;color:${color};border:1px solid ${color}44">${(c.tier||c.type||'').toUpperCase()}</span>
+    <div class="fs-popup-title">${c.name||c.company||'Contact'}</div>
+    <div class="fs-popup-grid">
+      ${c.title?`<span class="fs-popup-lbl">TITLE</span><span class="fs-popup-val">${c.title}</span>`:''}
+      ${c.company?`<span class="fs-popup-lbl">COMPANY</span><span class="fs-popup-val">${c.company}</span>`:''}
+      <span class="fs-popup-lbl">LOCATION</span><span class="fs-popup-val">${c.city||'—'}</span>
+      ${c.trade_lane?`<span class="fs-popup-lbl">LANE</span><span class="fs-popup-val">${c.trade_lane}</span>`:''}
+      ${c.score?`<span class="fs-popup-lbl">SCORE</span><span class="fs-popup-val" style="color:${color};font-weight:700">${c.score}/100</span>`:''}
+    </div>
+    ${addr}${angle}
+    <div class="fs-popup-btns">${mapsBtn}${liBtn}</div>
+  </div>`,{maxWidth:300});
+  m.on('click',()=>highlightCard(c.id));
+  markers[c.id]=m;
+  if(layerVisible[c.type]) m.addTo(map);
+}
+
+// ── LOAD CSV ──────────────────────────────────────────────────────────────
+function loadCSV(input,type) {
+  const file=input.files[0]; if(!file) return;
+  Papa.parse(file,{header:true,skipEmptyLines:true,complete:async(res)=>{
+    const rows=res.data, fields=Object.keys(rows[0]||{});
+    const get=(...keys)=>row=>{for(const k of keys){const m=fields.find(f=>f.toLowerCase().includes(k.toLowerCase()));if(m&&row[m])return row[m].trim();}return '';};
+    const getName=get('first name','name','full name');
+    const getLast=get('last name');
+    const getCompany=get('company','organization','employer','account');
+    const getTitle=get('title','position','role','job');
+    const getCity=get('city','location','address','region','geography');
+    const getStreet=get('street','address1','street address');
+    const getState=get('state','province');
+    const getZip=get('zip','postal');
+    let added=0;
+    for(const row of rows){
+      const name=(getName(row)+' '+getLast(row)).trim();
+      const company=getCompany(row), title=getTitle(row);
+      const city=getCity(row)||company; if(!city) continue;
+      const street=getStreet(row), state=getState(row), zip=getZip(row);
+      const fullAddr=street?[street,city,state,zip].filter(Boolean).join(', '):[city,state,zip].filter(Boolean).join(', ');
+      const id=`${type}-${Date.now()}-${Math.random()}`;
+      const c={id,type,name,company,title,city,address:fullAddr,inRadius:false,lat:null,lng:null};
+      await new Promise(r=>setTimeout(r,300));
+      const geo=await geocode(city+', USA');
+      if(geo){c.lat=geo.lat;c.lng=geo.lng;}
+      contacts.push(c); addMarker(c); added++;
+      updateStats(); if(added%5===0) renderList();
+    }
+    renderList(); updateStats();
+    toast(`✓ Loaded ${added} contacts from ${file.name}`);
+    input.value='';
+  }});
+}
+
+// ── DEMO DATA ─────────────────────────────────────────────────────────────
+function loadDemo() {
+  const demos=[
+    {id:'p1',type:'pipeline',name:'Sarah Johnson',title:'VP Supply Chain',company:'Hanes Brands Honduras',city:'San Pedro Sula, Honduras',lat:15.502,lng:-88.024},
+    {id:'p2',type:'pipeline',name:'Carlos Mejía',title:'Dir. Logistics',company:'Boston Scientific CR',city:'Coyol, Costa Rica',lat:9.928,lng:-84.091},
+    {id:'p3',type:'pipeline',name:'Maria Rodriguez',title:'Head of Ops',company:'PriceSmart Panama',city:'Panama City, Panama',lat:8.994,lng:-79.520},
+    {id:'p4',type:'pipeline',name:'James Williams',title:'VP Logistics',company:'Chewy Inc',city:'Ocala, FL',address:'1500 SW 30th Ave, Ocala, FL 34474',lat:29.187,lng:-82.140},
+    {id:'l1',type:'linkedin',name:'Mike Thompson',title:'CCO',company:'Trailer Bridge',city:'Jacksonville, FL',lat:30.332,lng:-81.656},
+    {id:'l2',type:'linkedin',name:'Ana Gutierrez',title:'Dir. Freight',company:'DHL Guatemala',city:'Guatemala City',lat:14.635,lng:-90.507},
+    {id:'l3',type:'linkedin',name:'David Park',title:'VP Sales',company:'Yusen Logistics',city:'Miami, FL',lat:25.762,lng:-80.192},
+    {id:'l4',type:'linkedin',name:'Jennifer Cruz',title:'BDM',company:'Maersk DR',city:'Santo Domingo, DR',lat:18.486,lng:-69.931},
+    {id:'s1',type:'signal',name:'Punta Cana FTZ',company:'Punta Cana Free Trade Zone',title:'FTZ Investment · $200M',city:'Punta Cana, DR',lat:18.582,lng:-68.408,
+      tier:'HOT',score:92,freight_angle:'New FTZ logistics and manufacturing hub — ocean freight for inbound raw materials and outbound finished goods DR → US East Coast / Florida.',
+      trade_lane:'Dominican Republic → US East Coast',
+      li_message:'Hi [Name], I came across the Punta Cana FTZ announcement and wanted to reach out. At CBX Global we specialize in the DR–US East Coast and Florida trade lanes. Would love to connect ahead of your logistics planning.'},
+    {id:'s2',type:'signal',name:'Tesla Gigafactory MX',company:'Tesla',title:'$2B plant expansion',city:'Monterrey, Mexico',lat:25.687,lng:-100.316,
+      tier:'HOT',score:96,freight_angle:'New EV plant adds massive cross-border freight volume — MX → US border lanes.',trade_lane:'Monterrey → Laredo TX'},
+    {id:'s3',type:'signal',name:'Nestlé Guatemala',company:'Nestlé',title:'$120M nutrition plant',city:'Guatemala City',lat:14.635,lng:-90.507,
+      tier:'WARM',score:88,freight_angle:'New manufacturing adds ocean freight through Puerto Quetzal → US East Coast.',trade_lane:'Puerto Quetzal → Miami/Jacksonville'},
+    {id:'i1',type:'import',name:'Active Importer',company:'Fruit of the Loom HN',title:'24 shipments/yr',city:'San Pedro Sula, Honduras',lat:15.499,lng:-88.020,
+      freight_angle:'High volume apparel importer — 24 shipments/yr through Puerto Cortés.'},
+    {id:'i2',type:'import',name:'Medical Exporter',company:'Medtronic CR',title:'18 shipments/yr',city:'Coyol, Costa Rica',lat:9.900,lng:-84.110,
+      freight_angle:'Medical device exporter through Caldera — consistent volume, time-sensitive freight.'},
+  ];
+  demos.forEach(c=>{c.inRadius=false;contacts.push(c);addMarker(c);});
+  updateStats(); renderList();
+}
+
+// ── RENDER SIDEBAR ────────────────────────────────────────────────────────
+function renderList() {
+  const list=document.getElementById('tab-contacts');
+  const visible=contacts.filter(c=>layerVisible[c.type]);
+  const inRadius=visible.filter(c=>c.inRadius);
+  const show=(inRadius.length>0?inRadius:visible).sort((a,b)=>(b.score||0)-(a.score||0));
+  document.getElementById('tab-contacts-badge').textContent=show.length;
+  if(!show.length){list.innerHTML=`<div class="empty-state"><span class="empty-icon">📡</span>Import a CSV or load demo data to see contacts on the map.</div>`;return;}
+  const hdr=inRadius.length>0?`<div style="font-family:var(--fm);font-size:8px;color:var(--teal);letter-spacing:1px;padding:4px 4px 8px">${inRadius.length} IN RADIUS</div>`:
+    `<div style="font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:1px;padding:4px 4px 8px">ALL ${show.length} CONTACTS</div>`;
+  list.innerHTML=hdr+show.map(c=>{
+    const color=typeColor(c);
+    const badge=c.type==='signal'?(c.tier||'SIGNAL'):c.type.toUpperCase();
+    const score=c.score?`<span class="cc-score" style="color:${color}">${c.score}</span>`:'';
+    const addr=c.address&&c.address!==c.city?c.address:c.city||'—';
+    return `<div class="contact-card" id="card-${c.id}" style="--card-color:${color}" onclick="focusContact('${c.id}')">
+      <div class="cc-top">
+        <div class="cc-name">${c.name||c.company||'Unknown'}</div>
+        <span class="cc-badge" style="background:${color}22;color:${color};border:1px solid ${color}44">${badge}</span>
+      </div>
+      ${c.title?`<div class="cc-meta">${c.title}</div>`:''}
+      ${c.company?`<div class="cc-meta" style="color:var(--t3)">${c.company}</div>`:''}
+      <div class="cc-addr">📍 ${addr} ${score}</div>
+    </div>`;
+  }).join('');
+}
+
+function focusContact(id) {
+  const c=contacts.find(x=>x.id===id); if(!c||!c.lat) return;
+  map.setView([c.lat,c.lng],12);
+  if(markers[id]) markers[id].openPopup();
+  highlightCard(id);
+}
+function highlightCard(id) {
+  document.querySelectorAll('.contact-card').forEach(e=>e.classList.remove('active'));
+  const el=document.getElementById(`card-${id}`);
+  if(el){el.classList.add('active');el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+}
+function copyToClip(id,type) {
+  const c=contacts.find(x=>x.id===id);
+  const text=type==='li'?c?.li_message:c?.email_message;
+  if(text) navigator.clipboard.writeText(text).then(()=>toast('✓ Copied to clipboard'));
+}
+
+// ── LAYER TOGGLE ──────────────────────────────────────────────────────────
+function toggleLayer(type,btn) {
+  layerVisible[type]=!layerVisible[type];
+  const on=layerVisible[type], color=COLORS[type]||COLORS.linkedin;
+  btn.classList.toggle('on',on);
+  btn.querySelector('.dot').style.background=on?color:'var(--t3)';
+  contacts.filter(c=>c.type===type).forEach(c=>{
+    if(!markers[c.id]) return;
+    if(on) markers[c.id].addTo(map); else markers[c.id].remove();
+  });
+  renderList();
+}
+
+// ── TAB SWITCH ────────────────────────────────────────────────────────────
+function switchTab(tab,el) {
+  ['contacts','alerts','tools'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===tab?'':'none';
+  });
+  document.querySelectorAll('.alert-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(tab==='contacts') document.getElementById('tab-contacts').style.display='flex';
+}
+// Make contacts tab a flex column
+document.getElementById('tab-contacts').style.display='flex';
+document.getElementById('tab-contacts').style.flexDirection='column';
+
+// ── STATS ─────────────────────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('statContacts').textContent=contacts.filter(c=>c.type!=='signal').length;
+  document.getElementById('statSignals').textContent=contacts.filter(c=>c.type==='signal').length;
+}
+
+// ── TOOLS ─────────────────────────────────────────────────────────────────
+async function callAI(prompt) {
+  const r=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:600,messages:[{role:"user",content:prompt}]})
+  });
+  const d=await r.json();
+  return d.content?.[0]?.text||"Error — check API connection";
+}
+
+async function lookupHS() {
+  const q=document.getElementById('hs-query').value.trim(); if(!q) return;
+  const el=document.getElementById('hs-result');
+  el.style.display='block'; el.innerHTML='<span style="color:var(--teal)">Looking up HS codes...</span>';
+  const result=await callAI(`You are a customs and trade specialist. For the product: "${q}", provide:
+1. Most likely HS code (6-digit)
+2. Product description
+3. US import duty rate (MFN rate)
+4. CAFTA duty rate if applicable (Costa Rica, Honduras, Guatemala, El Salvador, Nicaragua, Dominican Republic)
+5. USMCA duty rate if applicable (Mexico/Canada)
+Format as: HS CODE: [code] | DESCRIPTION: [desc] | US DUTY: [rate]% | CAFTA: [rate]% | USMCA: [rate]%
+Then one line: FREIGHT NOTE: [relevant freight/cargo handling note for this commodity]`);
+  el.innerHTML=result.replace(/
+/g,'<br>').replace(/(HS CODE:|DESCRIPTION:|US DUTY:|CAFTA:|USMCA:|FREIGHT NOTE:)/g,'<strong>$1</strong>');
+}
+
+async function checkFTA() {
+  const product=document.getElementById('fta-product').value.trim();
+  const origin=document.getElementById('fta-origin').value.trim();
+  const dest=document.getElementById('fta-dest').value.trim();
+  if(!product||!origin||!dest) return;
+  const el=document.getElementById('fta-result');
+  el.style.display='block'; el.innerHTML='<span style="color:var(--teal)">Checking free trade agreements...</span>';
+  const result=await callAI(`You are a trade compliance specialist. Check if this shipment qualifies for preferential duty rates:
+Product: ${product} | Origin: ${origin} | Destination: ${dest}
+Answer: Does a free trade agreement apply? Which one? What is the preferential duty rate vs MFN rate? What documents are required to claim the preference? Any rules of origin requirements?
+Be specific and practical. Format clearly with line breaks.`);
+  el.innerHTML=result.replace(/
+/g,'<br>');
+}
+
+async function checkImportReqs() {
+  const product=document.getElementById('imp-product').value.trim();
+  const country=document.getElementById('imp-country').value.trim();
+  if(!product||!country) return;
+  const el=document.getElementById('imp-result');
+  el.style.display='block'; el.innerHTML='<span style="color:var(--teal)">Checking import requirements...</span>';
+  const result=await callAI(`You are a customs and import compliance specialist. What are the import requirements for:
+Product: ${product} | Destination: ${country}
+Cover: Required permits/licenses, labeling requirements, inspection requirements, prohibited items or restrictions, estimated import duty, any special certifications needed.
+Be practical and specific to this country. Format with line breaks.`);
+  el.innerHTML=result.replace(/
+/g,'<br>');
+}
+
+async function explainIncoterm() {
+  const term=document.getElementById('inco-term').value; if(!term) return;
+  const el=document.getElementById('inco-result');
+  el.style.display='block'; el.innerHTML='<span style="color:var(--teal)">Loading...</span>';
+  const result=await callAI(`Explain the Incoterm "${term}" for a freight sales rep. Cover: who pays freight, who arranges insurance, where risk transfers, who handles customs, and when a shipper or buyer would choose this term. Keep it practical and under 150 words.`);
+  el.innerHTML=result.replace(/
+/g,'<br>');
+}
+
+// ── TRIP OUTREACH ─────────────────────────────────────────────────────────
+function openTripModal() {
+  const city=document.getElementById('tripCity').value;
+  if(city) document.getElementById('tm-city').value=city;
+  document.getElementById('tripModal').classList.add('open');
+  document.getElementById('tm-results').style.display='none';
+}
+function closeTripModal(){document.getElementById('tripModal').classList.remove('open');}
+function setTone(t,btn){currentTone=t;document.querySelectorAll('.tone-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+
+async function generateTripOutreach() {
+  const city=document.getElementById('tm-city').value.trim();
+  const date=document.getElementById('tm-date').value.trim();
+  const myName=document.getElementById('tm-name').value.trim();
+  const myComp=document.getElementById('tm-company').value.trim();
+  if(!city||!date){toast('Enter city and date');return;}
+  let targets=contacts.filter(c=>c.inRadius||(!radiusCenter&&c.lat));
+  if(!targets.length){toast('No contacts in radius — set a trip city first');return;}
+  const btn=document.getElementById('tm-gen-btn');
+  btn.textContent=`Writing ${targets.length} messages...`;
+  btn.style.opacity='.7';btn.style.pointerEvents='none';
+  tripOutreachData=[];
+  const cards=[];
+  for(let i=0;i<targets.length;i++){
+    const c=targets[i];
+    btn.textContent=`Writing ${i+1} of ${targets.length}...`;
+    const li=buildTripMsg(c,city,date,myName,myComp);
+    const email=buildTripEmail(c,city,date,myName,myComp);
+    tripOutreachData.push({contact:c,linkedin:li,email});
+    const color=typeColor(c);
+    cards.push(`<div class="outreach-card">
+      <div class="outreach-card-name">${c.name||c.company||'Contact'} <span style="font-family:var(--fm);font-size:7px;background:${color}22;color:${color};padding:2px 5px;border-radius:2px">${(c.type||'').toUpperCase()}</span></div>
+      <div class="outreach-card-meta">${c.title?c.title+' · ':''}${c.company||''} · 📍 ${c.city||''}</div>
+      <div style="font-family:var(--fm);font-size:8px;color:var(--teal);margin-bottom:4px;letter-spacing:.5px">💼 LINKEDIN:</div>
+      <div class="msg-box" id="li-${i}">${li}</div>
+      <div style="font-family:var(--fm);font-size:8px;color:var(--teal);margin-bottom:4px;letter-spacing:.5px">📧 EMAIL (copy → paste into Outlook):</div>
+      <div class="msg-box" id="em-${i}">${email}</div>
+      <div class="copy-row">
+        <button class="copy-btn copy-teal" onclick="copyEl('li-${i}')">💼 Copy LinkedIn</button>
+        <button class="copy-btn copy-ghost" onclick="copyEl('em-${i}')">📧 Copy Email</button>
+      </div>
+    </div>`);
+  }
+  document.getElementById('tm-results-hdr').textContent=`${targets.length} OUTREACH MESSAGES · ${city} · ${date}`;
+  document.getElementById('tm-cards').innerHTML=cards.join('');
+  document.getElementById('tm-results').style.display='block';
+  btn.textContent='🔄 Regenerate';btn.style.opacity='1';btn.style.pointerEvents='';
+  btn.style.background='linear-gradient(135deg,rgba(0,152,152,.2),rgba(0,152,152,.1))';
+  btn.style.color='var(--teal)';btn.style.border='1px solid rgba(0,200,200,.3)';
+}
+
+function buildTripMsg(c,city,date,name,comp) {
+  const fn=(c.name||'').split(' ')[0]||'there';
+  const sig=c.type==='signal'?`I came across the recent announcement about ${c.company}'s expansion and wanted to reach out before my trip. `:'';
+  if(currentTone==='brief') return `Hi ${fn} — I'll be in the ${city} area on ${date} and would love to stop by for a quick visit if your schedule allows. I'm with ${comp}. Worth 20 minutes? — ${name}`;
+  if(currentTone==='professional') return `Hi ${fn},
+
+${sig}I'll be visiting the ${city} market on ${date} and wanted to reach out ahead of my trip.
+
+Would you have 20-30 minutes available for a brief meeting while I'm in the area?
+
+Best regards,
+${name}
+${comp}`;
+  return `Hi ${fn},
+
+${sig}I'll be in the ${city} area on ${date} and thought this would be a great opportunity to stop by and say hello in person.
+
+Would love to connect for a quick visit — even 20 minutes would be great.
+
+Looking forward to it!
+${name}
+${comp}`;
+}
+
+function buildTripEmail(c,city,date,name,comp) {
+  const fn=(c.name||'').split(' ')[0]||'there';
+  return `Subject: Visiting ${city} — ${date} — Would Love to Stop By
+
+Hi ${fn},
+
+I'll be in the ${city} market on ${date} and wanted to reach out personally ahead of my visit.
+
+${c.freight_angle?c.freight_angle+'
+
+':''}I'd love to stop by ${c.company||'your office'} for a brief visit while I'm in town. Even 20-30 minutes would be great.
+
+Are you available on ${date} or around that time?
+
+Looking forward to connecting,
+${name}
+${comp}
+(904) 864-7040
+jeff@freightsignal.net`;
+}
+
+function copyEl(id) {
+  const el=document.getElementById(id);
+  if(el) navigator.clipboard.writeText(el.textContent).then(()=>{
+    el.style.borderColor='var(--teal)';setTimeout(()=>el.style.borderColor='',800);
+    toast('✓ Copied');
+  });
+}
+
+function exportTripOutreach() {
+  if(!tripOutreachData.length) return;
+  const rows=[['Name','Title','Company','City','Full Address','Google Maps','Type','Score','LinkedIn','Email Subject','Email Body']];
+  tripOutreachData.forEach(({contact:c,linkedin,email})=>{
+    const lines=email.split('
+');const subj=lines[0].replace('Subject: ','');const body=lines.slice(2).join('
+');
+    rows.push([c.name||'',c.title||'',c.company||'',c.city||'',c.address||c.city||'',
+      c.address?`https://maps.google.com/?q=${encodeURIComponent(c.address)}`:'',
+      c.type||'',c.score||'',linkedin,subj,body]);
+  });
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('
+');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`freightsignal-trip-${document.getElementById('tm-city').value.replace(/[^a-z0-9]/gi,'-')}.csv`;
+  a.click();
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────
+function exportVisible() {
+  const data=contacts.filter(c=>!radiusCenter||c.inRadius);
+  if(!data.length){toast('No contacts to export');return;}
+  const rows=[['Name','Title','Company','City','Full Address','Google Maps Link','Type','Score','Trade Lane','Freight Angle','LinkedIn Message']];
+  data.forEach(c=>rows.push([c.name||'',c.title||'',c.company||'',c.city||'',c.address||c.city||'',
+    c.address?`https://maps.google.com/?q=${encodeURIComponent(c.address)}`:'',
+    c.type||'',c.score||'',c.trade_lane||'',c.freight_angle||'',c.li_message||'']));
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('
+');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='freightsignal-territory-map.csv';a.click();
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');el.textContent=msg;el.style.display='block';
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.style.display='none',3000);
+}
+
+// ── KEYBOARD ──────────────────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') closeTripModal();
+  if(e.key==='Enter'&&document.activeElement===document.getElementById('tripCity')) findCity();
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+loadDemo();
+</script>
+</body>
+</html>

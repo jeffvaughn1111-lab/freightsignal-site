@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -219,7 +220,7 @@ body::before{
 .leaflet-tile-pane{
   filter: brightness(0.85) contrast(1.1);
 }
-.leaflet-container{background:#060e12}
+.leaflet-container{background:linear-gradient(135deg,#060e12,#0a1e28,#060e12)}
 
 /* Grid overlay on map */
 .map-grid-overlay{
@@ -627,20 +628,11 @@ function typeColor(c) { return c.type==='signal' ? (c.tier==='HOT'?COLORS.signal
 
 // ── MAP INIT ──────────────────────────────────────────────────────────────
 const map = L.map('map',{zoomControl:true,preferCanvas:true}).setView([18,-75],4);
-// Try CartoDB dark tiles first — best for dark UI
-const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '© OpenStreetMap © CARTO',
-  subdomains: 'abcd',
-  maxZoom: 19
-});
-tiles.addTo(map);
-
-// If CartoDB fails, fallback to OSM with dark filter
-tiles.on('tileerror', function() {
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap', maxZoom: 19
-  }).addTo(map);
-});
+// Esri World Dark Gray — reliable, open CORS, no API key needed
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+  attribution: 'Esri, HERE, Garmin, © OpenStreetMap',
+  maxZoom: 16
+}).addTo(map);
 
 // Coordinate display
 map.on('mousemove', e => {
@@ -1091,6 +1083,15 @@ document.addEventListener('keydown',e=>{
 
 // ── INIT ──────────────────────────────────────────────────────────────────
 loadDemo();
+
+// Check if map tiles loaded — if still black after 3 seconds show help
+setTimeout(() => {
+  const canvas = document.querySelector('.leaflet-tile-pane');
+  if (canvas) {
+    // Add a colored background so at least the map area is visible
+    document.getElementById('map').style.background = 'linear-gradient(135deg, #060e12 0%, #0a1e28 50%, #060e12 100%)';
+  }
+}, 1000);
 </script>
 </body>
 </html>

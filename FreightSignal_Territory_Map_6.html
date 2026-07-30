@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -218,7 +219,7 @@ body::before{
 
 /* Dark military-style map tiles */
 .leaflet-tile-pane{
-  filter: brightness(0.5) invert(1) hue-rotate(160deg) saturate(0.4) contrast(1.2);
+  filter: brightness(0.7) saturate(0.6);
 }
 .leaflet-container{background:linear-gradient(135deg,#060e12,#0a1e28,#060e12)}
 
@@ -628,12 +629,40 @@ function typeColor(c) { return c.type==='signal' ? (c.tier==='HOT'?COLORS.signal
 
 // ── MAP INIT ──────────────────────────────────────────────────────────────
 const map = L.map('map',{zoomControl:true,preferCanvas:true}).setView([18,-75],4);
-// Stamen Toner — dark, works everywhere, no API key
-L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png', {
-  attribution: '© Stadia Maps © Stamen Design © OpenStreetMap',
-  maxZoom: 20,
-  crossOrigin: ''
-}).addTo(map);
+// Try multiple tile sources in sequence until one works
+const tileSources = [
+  {
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    opts: { attribution: '© OpenStreetMap', maxZoom: 19, subdomains: 'abc' }
+  },
+  {
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    opts: { attribution: '© OpenStreetMap', maxZoom: 19 }
+  },
+  {
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    opts: { attribution: '© Esri', maxZoom: 18 }
+  }
+];
+
+let tileLayerAdded = false;
+function tryTileSource(idx) {
+  if (idx >= tileSources.length) {
+    console.log('All tile sources failed — showing coordinate grid only');
+    return;
+  }
+  const src = tileSources[idx];
+  const layer = L.tileLayer(src.url, src.opts);
+  layer.on('tileerror', () => {
+    if (!tileLayerAdded) {
+      map.removeLayer(layer);
+      tryTileSource(idx + 1);
+    }
+  });
+  layer.on('tileload', () => { tileLayerAdded = true; });
+  layer.addTo(map);
+}
+tryTileSource(0);
 
 // Coordinate display
 map.on('mousemove', e => {
@@ -889,8 +918,7 @@ async function lookupHS() {
 5. USMCA duty rate if applicable (Mexico/Canada)
 Format as: HS CODE: [code] | DESCRIPTION: [desc] | US DUTY: [rate]% | CAFTA: [rate]% | USMCA: [rate]%
 Then one line: FREIGHT NOTE: [relevant freight/cargo handling note for this commodity]`);
-  el.innerHTML=result.replace(/
-/g,'<br>').replace(/(HS CODE:|DESCRIPTION:|US DUTY:|CAFTA:|USMCA:|FREIGHT NOTE:)/g,'<strong>$1</strong>');
+  el.innerHTML=result.replace(\n/g,'<br>').replace(/(HS CODE:|DESCRIPTION:|US DUTY:|CAFTA:|USMCA:|FREIGHT NOTE:)/g,'<strong>$1</strong>');
 }
 
 async function checkFTA() {
@@ -904,8 +932,7 @@ async function checkFTA() {
 Product: ${product} | Origin: ${origin} | Destination: ${dest}
 Answer: Does a free trade agreement apply? Which one? What is the preferential duty rate vs MFN rate? What documents are required to claim the preference? Any rules of origin requirements?
 Be specific and practical. Format clearly with line breaks.`);
-  el.innerHTML=result.replace(/
-/g,'<br>');
+  el.innerHTML=result.replace(\n/g,'<br>');
 }
 
 async function checkImportReqs() {
@@ -918,8 +945,7 @@ async function checkImportReqs() {
 Product: ${product} | Destination: ${country}
 Cover: Required permits/licenses, labeling requirements, inspection requirements, prohibited items or restrictions, estimated import duty, any special certifications needed.
 Be practical and specific to this country. Format with line breaks.`);
-  el.innerHTML=result.replace(/
-/g,'<br>');
+  el.innerHTML=result.replace(\n/g,'<br>');
 }
 
 async function explainIncoterm() {
@@ -927,8 +953,7 @@ async function explainIncoterm() {
   const el=document.getElementById('inco-result');
   el.style.display='block'; el.innerHTML='<span style="color:var(--teal)">Loading...</span>';
   const result=await callAI(`Explain the Incoterm "${term}" for a freight sales rep. Cover: who pays freight, who arranges insurance, where risk transfers, who handles customs, and when a shipper or buyer would choose this term. Keep it practical and under 150 words.`);
-  el.innerHTML=result.replace(/
-/g,'<br>');
+  el.innerHTML=result.replace(\n/g,'<br>');
 }
 
 // ── TRIP OUTREACH ─────────────────────────────────────────────────────────

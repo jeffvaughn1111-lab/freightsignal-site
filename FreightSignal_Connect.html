@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreightSignal Connect — Partner Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060e12;--surf:#0a1a20;--surf2:#0f2530;--surf3:#142e38;
+  --teal:#00c8c8;--teal2:#009898;--teal3:#28e0e0;--teal4:rgba(0,200,200,0.08);
+  --t1:#e8f4f6;--t2:#7ab0b8;--t3:#3d6870;
+  --border:rgba(0,200,200,0.08);--border2:rgba(0,200,200,0.22);
+  --green:#10b981;--amber:#f59e0b;--purple:#8b5cf6;--blue:#3b82f6;
+  --ff:"Inter",sans-serif;--fm:"JetBrains Mono",monospace;
+  --glow:0 0 20px rgba(0,200,200,0.15);
+}
+html,body{background:var(--bg);color:var(--t1);font-family:var(--ff);min-height:100vh}
+
+/* TOPBAR */
+.topbar{background:linear-gradient(90deg,#040c0f,#060e12);border-bottom:1px solid var(--border2);padding:0 32px;display:flex;align-items:center;gap:16px;height:60px;position:sticky;top:0;z-index:100}
+.topbar::after{content:"";position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--teal),transparent)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-name{font-size:18px;font-weight:900;letter-spacing:-.5px}
+.brand-name em{color:var(--teal);font-style:normal}
+.brand-sep{color:var(--t3);font-size:18px;margin:0 4px}
+.brand-connect{font-size:18px;font-weight:900;color:var(--green)}
+.brand-sub{font-family:var(--fm);font-size:7px;letter-spacing:2.5px;color:var(--t3);display:block;margin-top:2px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.member-count{font-family:var(--fm);font-size:9px;color:var(--teal);border:1px solid var(--border2);padding:4px 12px;border-radius:3px;background:var(--teal4)}
+.btn-join{background:linear-gradient(135deg,var(--teal2),var(--teal));border:none;border-radius:5px;color:var(--bg);font-family:var(--fm);font-size:10px;font-weight:700;padding:8px 18px;cursor:pointer;letter-spacing:.5px}
+
+/* HERO BAND */
+.hero-band{background:linear-gradient(135deg,#0a1e28,#0f2530);border-bottom:1px solid var(--border2);padding:32px;text-align:center}
+.hero-badge{font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--green);border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.06);padding:4px 14px;border-radius:3px;display:inline-block;margin-bottom:14px}
+.hero-h1{font-size:28px;font-weight:900;margin-bottom:8px}
+.hero-h1 span{color:var(--teal)}
+.hero-sub{font-size:14px;color:var(--t2);max-width:600px;margin:0 auto 20px;line-height:1.6}
+.vs-strip{display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap;margin-top:20px}
+.vs-item{text-align:center}
+.vs-label{font-family:var(--fm);font-size:8px;letter-spacing:1px;color:var(--t3);margin-bottom:4px}
+.vs-val-bad{font-size:18px;font-weight:800;color:#ef4444}
+.vs-val-good{font-size:18px;font-weight:800;color:var(--green)}
+.vs-sep{font-size:24px;color:var(--t3);font-weight:300}
+
+/* MAIN LAYOUT */
+.main{display:grid;grid-template-columns:340px 1fr;gap:0;min-height:calc(100vh - 140px)}
+
+/* LEFT PANEL — FILTERS & JOIN */
+.left-panel{background:var(--surf);border-right:1px solid var(--border2);padding:20px;overflow-y:auto}
+.panel-title{font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--teal);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.panel-title::after{content:"";flex:1;height:1px;background:var(--border)}
+
+/* Join form */
+.join-form{background:var(--surf2);border:1px solid var(--border2);border-radius:8px;padding:18px;margin-bottom:20px}
+.join-form-title{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.join-form-sub{font-size:11px;color:var(--t2);margin-bottom:14px;line-height:1.5}
+.form-group{margin-bottom:12px}
+.form-label{display:block;font-family:var(--fm);font-size:8px;letter-spacing:1px;color:var(--t3);text-transform:uppercase;margin-bottom:5px}
+.form-input{width:100%;background:var(--surf3);border:1px solid var(--border);border-radius:4px;color:var(--t1);font-family:var(--ff);font-size:12px;padding:8px 10px;outline:none;transition:all .15s}
+.form-input:focus{border-color:var(--teal);box-shadow:0 0 0 2px rgba(0,200,200,0.08)}
+.form-input::placeholder{color:var(--t3)}
+.form-select{width:100%;background:var(--surf3);border:1px solid var(--border);border-radius:4px;color:var(--t1);font-family:var(--ff);font-size:12px;padding:8px 10px;outline:none;cursor:pointer}
+.form-select option{background:var(--surf2)}
+
+/* Checkboxes */
+.check-group{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.check-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t2);cursor:pointer}
+.check-item input{accent-color:var(--teal);width:13px;height:13px}
+.check-item:hover{color:var(--t1)}
+
+/* Upload zone */
+.upload-zone{border:1px dashed var(--border2);border-radius:5px;padding:14px;text-align:center;cursor:pointer;transition:all .15s;margin-bottom:12px}
+.upload-zone:hover{border-color:var(--teal);background:var(--teal4)}
+.upload-icon{font-size:20px;margin-bottom:6px}
+.upload-label{font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.5px}
+.upload-sub{font-size:10px;color:var(--t3);margin-top:3px}
+
+.submit-btn{width:100%;padding:10px;border-radius:5px;border:none;background:linear-gradient(135deg,var(--teal2),var(--teal));color:var(--bg);font-family:var(--fm);font-size:10px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s}
+.submit-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,200,200,0.3)}
+
+/* Filter section */
+.filter-section{margin-bottom:16px}
+.filter-chips{display:flex;flex-wrap:wrap;gap:5px}
+.filter-chip{font-family:var(--fm);font-size:8px;padding:3px 8px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;transition:all .12s;letter-spacing:.3px}
+.filter-chip.on{background:var(--teal4);border-color:var(--teal);color:var(--teal);font-weight:700}
+.filter-chip:hover{border-color:var(--teal);color:var(--teal)}
+
+.search-input{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:4px;color:var(--t1);font-family:var(--ff);font-size:12px;padding:8px 10px;outline:none;margin-bottom:12px}
+.search-input:focus{border-color:var(--teal)}
+.search-input::placeholder{color:var(--t3)}
+
+/* RIGHT PANEL — MEMBER CARDS */
+.right-panel{padding:20px;overflow-y:auto}
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.results-count{font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:1px}
+.sort-sel{background:var(--surf2);border:1px solid var(--border);border-radius:4px;color:var(--t2);font-family:var(--fm);font-size:9px;padding:5px 8px;outline:none;cursor:pointer}
+
+.member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+
+/* Member card */
+.member-card{background:var(--surf);border:1px solid var(--border);border-radius:8px;padding:16px;transition:all .15s;position:relative;overflow:hidden}
+.member-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--card-accent,var(--teal))}
+.member-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.card-company{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:2px}
+.card-location{font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.3px}
+.verified-badge{display:flex;align-items:center;gap:3px;font-family:var(--fm);font-size:7px;color:var(--green);background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);padding:2px 7px;border-radius:3px;white-space:nowrap}
+
+.card-services{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.service-tag{font-family:var(--fm);font-size:8px;padding:2px 7px;border-radius:3px;background:var(--teal4);border:1px solid var(--border2);color:var(--teal);letter-spacing:.3px}
+.service-tag.special{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.25);color:var(--green)}
+
+.card-lanes{margin-bottom:10px}
+.lanes-label{font-family:var(--fm);font-size:7px;letter-spacing:1.5px;color:var(--t3);text-transform:uppercase;margin-bottom:4px}
+.lane-item{font-size:10px;color:var(--t2);display:flex;align-items:center;gap:5px;margin-bottom:2px}
+.lane-arrow{color:var(--teal);font-size:10px}
+
+.card-cargo{margin-bottom:12px}
+.cargo-label{font-family:var(--fm);font-size:7px;letter-spacing:1.5px;color:var(--t3);text-transform:uppercase;margin-bottom:4px}
+.cargo-tags{display:flex;flex-wrap:wrap;gap:3px}
+.cargo-tag{font-size:9px;color:var(--t2);background:var(--surf2);border:1px solid var(--border);padding:2px 6px;border-radius:3px}
+
+.card-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border)}
+.card-lang{font-family:var(--fm);font-size:8px;color:var(--t3)}
+.card-capacity{font-family:var(--fm);font-size:8px;color:var(--t3)}
+.connect-btn{padding:5px 14px;border-radius:4px;border:1px solid var(--teal);background:var(--teal4);color:var(--teal);font-family:var(--fm);font-size:8px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.3px}
+.connect-btn:hover{background:var(--teal);color:var(--bg)}
+
+/* AI Match banner */
+.ai-match-banner{background:linear-gradient(135deg,rgba(139,92,246,0.12),rgba(0,200,200,0.06));border:1px solid rgba(139,92,246,0.25);border-radius:8px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px}
+.ai-match-icon{font-size:20px;flex-shrink:0}
+.ai-match-text{font-size:11px;color:var(--t2);line-height:1.6}
+.ai-match-text strong{color:var(--t1);display:block;margin-bottom:3px}
+.ai-match-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.ai-match-tag{font-family:var(--fm);font-size:8px;padding:3px 9px;border-radius:3px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.25);color:#a78bfa;cursor:pointer}
+.ai-match-tag:hover{background:rgba(139,92,246,0.2)}
+
+/* Post board */
+.post-board{background:var(--surf2);border:1px solid var(--border2);border-radius:8px;padding:14px;margin-bottom:16px}
+.post-board-title{font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:var(--amber);text-transform:uppercase;margin-bottom:10px}
+.post-item{padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px}
+.post-item:last-child{border-bottom:none;padding-bottom:0}
+.post-type{font-family:var(--fm);font-size:7px;padding:2px 7px;border-radius:2px;font-weight:700;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.post-need{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25)}
+.post-offer{background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.25)}
+.post-text{font-size:11px;color:var(--t2);line-height:1.5;flex:1}
+.post-meta{font-family:var(--fm);font-size:8px;color:var(--t3);margin-top:3px}
+.post-reply{font-family:var(--fm);font-size:8px;color:var(--teal);cursor:pointer;background:none;border:none;padding:0;margin-top:4px}
+
+/* Toast */
+#toast{position:fixed;bottom:20px;right:20px;z-index:9999;background:var(--surf2);border:1px solid var(--border2);border-radius:5px;padding:10px 18px;font-family:var(--fm);font-size:10px;color:var(--teal);display:none;box-shadow:var(--glow)}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(4,10,13,0.92);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surf);border:1px solid var(--border2);border-radius:10px;width:100%;max-width:480px;box-shadow:0 40px 100px rgba(0,0,0,0.8),var(--glow)}
+.modal-head{background:var(--surf2);padding:14px 20px;border-bottom:2px solid var(--teal);display:flex;align-items:center;justify-content:space-between;border-radius:10px 10px 0 0}
+.modal-title{font-size:15px;font-weight:800;color:var(--t1)}
+.modal-close{background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer}
+.modal-body{padding:20px}
+.modal-company{font-size:16px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.modal-location{font-family:var(--fm);font-size:10px;color:var(--t2);margin-bottom:16px}
+.modal-section{margin-bottom:14px}
+.modal-section-title{font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:var(--teal);text-transform:uppercase;margin-bottom:6px}
+.modal-textarea{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:4px;color:var(--t1);font-family:var(--ff);font-size:12px;padding:9px 11px;outline:none;resize:vertical;min-height:80px}
+.modal-textarea:focus{border-color:var(--teal)}
+.modal-textarea::placeholder{color:var(--t3)}
+.modal-send-btn{width:100%;padding:10px;border-radius:5px;border:none;background:linear-gradient(135deg,var(--teal2),var(--teal));color:var(--bg);font-family:var(--fm);font-size:10px;font-weight:700;letter-spacing:.5px;cursor:pointer;margin-top:10px}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--surf)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <svg width="28" height="28" viewBox="0 0 44 44" fill="none">
+      <path d="M22 2C14.268 2 8 8.268 8 16c0 10 14 26 14 26s14-16 14-26C36 8.268 29.732 2 22 2z" fill="none" stroke="#00C8C8" stroke-width="2.2"/>
+      <circle cx="22" cy="16" r="2" fill="#00C8C8"/>
+      <line x1="22" y1="14" x2="22" y2="10" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="22" y1="10" x2="17" y2="10" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="17" cy="10" r="1.5" fill="#00C8C8"/>
+      <line x1="22" y1="10" x2="27" y2="10" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="27" cy="10" r="1.5" fill="#00C8C8"/>
+      <line x1="22" y1="18" x2="22" y2="22" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="22" y1="22" x2="17" y2="22" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="17" cy="22" r="1.5" fill="#00C8C8"/>
+      <line x1="22" y1="22" x2="27" y2="22" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="27" cy="22" r="1.5" fill="#00C8C8"/>
+    </svg>
+    <div>
+      <div class="brand-name">Freight<em>Signal</em><span class="brand-sep">·</span><span class="brand-connect">Connect</span></div>
+      <span class="brand-sub">VERIFIED FREIGHT PARTNER NETWORK</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="member-count">🟢 FOUNDING MEMBERS — FREE YEAR 1</div>
+    <button class="btn-join" onclick="document.getElementById('join-form-top').scrollIntoView({behavior:'smooth'})">+ JOIN NETWORK</button>
+  </div>
+</header>
+
+<!-- HERO BAND -->
+<div class="hero-band">
+  <div class="hero-badge">✅ INCLUDED WITH ALL FREIGHTSIGNAL PLANS — FREE YEAR 1</div>
+  <h1 class="hero-h1">Find Your Partner on <span>Every Lane</span></h1>
+  <p class="hero-sub">WCA costs $2,500/yr and flies you to Hong Kong. FreightSignal Connect is free with your subscription — AI matches you with verified freight partners globally. One lead pays for your entire year.</p>
+  <div class="vs-strip">
+    <div class="vs-item">
+      <div class="vs-label">WCA ANNUAL FEE</div>
+      <div class="vs-val-bad">$2,500+/yr</div>
+    </div>
+    <div class="vs-sep">vs</div>
+    <div class="vs-item">
+      <div class="vs-label">FSC ANNUAL FEE</div>
+      <div class="vs-val-good">$0 Year 1</div>
+    </div>
+    <div class="vs-sep">·</div>
+    <div class="vs-item">
+      <div class="vs-label">WCA CONFERENCE</div>
+      <div class="vs-val-bad">$5,000+ Dubai</div>
+    </div>
+    <div class="vs-sep">vs</div>
+    <div class="vs-item">
+      <div class="vs-label">FSC EVENTS</div>
+      <div class="vs-val-good">Virtual · Free</div>
+    </div>
+    <div class="vs-sep">·</div>
+    <div class="vs-item">
+      <div class="vs-label">PAYMENT GUARANTEE</div>
+      <div class="vs-val-bad">WCA (extra fee)</div>
+    </div>
+    <div class="vs-sep">vs</div>
+    <div class="vs-item">
+      <div class="vs-label">FSC VETTING</div>
+      <div class="vs-val-good">Insurance + Docs</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT PANEL -->
+  <aside class="left-panel">
+
+    <!-- JOIN FORM -->
+    <div id="join-form-top">
+      <div class="panel-title">Join FreightSignal Connect</div>
+      <div class="join-form">
+        <div class="join-form-title">List Your Services</div>
+        <div class="join-form-sub">Add your company once. AI matches you with opportunities globally. Verified members get a badge.</div>
+
+        <!-- SECTION 1: COMPANY INFO -->
+        <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--teal);text-transform:uppercase;margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border2)">① Company Information</div>
+
+        <div class="form-group">
+          <label class="form-label">Legal Company Name *</label>
+          <input class="form-input" id="f-company" placeholder="Gulf Coast Drayage LLC">
+        </div>
+        <div class="form-group">
+          <label class="form-label">DBA / Trading Name (if different)</label>
+          <input class="form-input" id="f-dba" placeholder="Gulf Coast Freight">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="form-group">
+            <label class="form-label">Country *</label>
+            <select class="form-select" id="f-country">
+              <option>United States</option>
+              <option>Mexico</option>
+              <option>Dominican Republic</option>
+              <option>Puerto Rico (US)</option>
+              <option>Costa Rica</option>
+              <option>Honduras</option>
+              <option>Guatemala</option>
+              <option>Panama</option>
+              <option>Jamaica</option>
+              <option>Colombia</option>
+              <option>Brazil</option>
+              <option>China</option>
+              <option>Vietnam</option>
+              <option>Philippines</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">City / State *</label>
+            <input class="form-input" id="f-city" placeholder="Houston, TX">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Physical Address</label>
+          <input class="form-input" id="f-address" placeholder="1234 Port Blvd, Houston TX 77001">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Website</label>
+          <input class="form-input" id="f-web" placeholder="www.yourcompany.com">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="form-group">
+            <label class="form-label">Year Established</label>
+            <input class="form-input" id="f-year" placeholder="2008">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Number of Employees</label>
+            <select class="form-select" id="f-size">
+              <option>1–5</option>
+              <option>6–20</option>
+              <option>21–50</option>
+              <option>51–100</option>
+              <option>100+</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- SECTION 2: PRIMARY CONTACT -->
+        <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--teal);text-transform:uppercase;margin:14px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border2)">② Primary Contact</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="form-group">
+            <label class="form-label">First Name *</label>
+            <input class="form-input" id="f-fname" placeholder="John">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name *</label>
+            <input class="form-input" id="f-lname" placeholder="Smith">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Title / Position</label>
+          <input class="form-input" id="f-title" placeholder="VP Operations">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Business Email *</label>
+          <input class="form-input" type="email" id="f-email" placeholder="john@company.com">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="form-group">
+            <label class="form-label">Phone *</label>
+            <input class="form-input" id="f-phone" placeholder="+1 (713) 555-0100">
+          </div>
+          <div class="form-group">
+            <label class="form-label">WhatsApp (optional)</label>
+            <input class="form-input" id="f-wa" placeholder="+1 (713) 555-0100">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">LinkedIn Profile (optional)</label>
+          <input class="form-input" id="f-li" placeholder="linkedin.com/in/yourname">
+        </div>
+
+        <!-- SECTION 3: BILLING INFO -->
+        <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--teal);text-transform:uppercase;margin:14px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border2)">③ Billing Information</div>
+        <div style="font-size:10px;color:var(--t3);margin-bottom:10px;line-height:1.5">Required to receive payments from partner transactions. Billing info is encrypted and never shared with other members.</div>
+
+        <div class="form-group">
+          <label class="form-label">Billing Contact Name</label>
+          <input class="form-input" id="f-bill-name" placeholder="Same as primary contact">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Billing Email</label>
+          <input class="form-input" type="email" id="f-bill-email" placeholder="accounting@company.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Billing Address</label>
+          <input class="form-input" id="f-bill-addr" placeholder="Same as physical address">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="form-group">
+            <label class="form-label">Currency Preference</label>
+            <select class="form-select" id="f-currency">
+              <option>USD — US Dollar</option>
+              <option>MXN — Mexican Peso</option>
+              <option>EUR — Euro</option>
+              <option>DOP — Dominican Peso</option>
+              <option>CRC — Costa Rican Colon</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preferred Payment Method</label>
+            <select class="form-select" id="f-paymethod">
+              <option>Wire Transfer</option>
+              <option>ACH (US only)</option>
+              <option>PayPal</option>
+              <option>Zelle (US only)</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bank Name (for wire transfers)</label>
+          <input class="form-input" id="f-bank" placeholder="Chase Bank, Bank of America, etc.">
+        </div>
+        <div style="background:rgba(0,200,200,0.06);border:1px solid var(--border2);border-radius:4px;padding:10px;margin-bottom:12px;font-size:10px;color:var(--t2);line-height:1.5">
+          🔒 Bank account details are collected separately and securely during payment setup — not on this form.
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Services Offered (check all that apply)</label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox"> Port Drayage / Container Pickup</label>
+            <label class="check-item"><input type="checkbox"> Cross-Border Trucking (Mexico)</label>
+            <label class="check-item"><input type="checkbox"> Domestic Trucking (FTL / LTL)</label>
+            <label class="check-item"><input type="checkbox"> Ocean Freight (FCL / LCL)</label>
+            <label class="check-item"><input type="checkbox"> Air Freight</label>
+            <label class="check-item"><input type="checkbox"> Customs Clearance / Brokerage</label>
+            <label class="check-item"><input type="checkbox"> Warehousing / Storage</label>
+            <label class="check-item"><input type="checkbox"> Cross-Docking / Transload</label>
+            <label class="check-item"><input type="checkbox"> Order Fulfillment / Pick & Pack</label>
+            <label class="check-item"><input type="checkbox"> Origin Services / Consolidation</label>
+            <label class="check-item"><input type="checkbox"> Destination Agent Services</label>
+            <label class="check-item"><input type="checkbox"> Project Cargo / OOG</label>
+            <label class="check-item"><input type="checkbox"> Cold Chain / Reefer</label>
+            <label class="check-item"><input type="checkbox"> Pharmaceutical / GDP Certified</label>
+            <label class="check-item"><input type="checkbox"> Last Mile Delivery</label>
+            <label class="check-item"><input type="checkbox"> NVOCC / Freight Forwarding</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Trade Lanes (e.g. Miami → Caribbean, Monterrey → Laredo)</label>
+          <input class="form-input" id="f-lanes" placeholder="List your key trade lanes, one per line">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Cargo Specialties</label>
+          <input class="form-input" id="f-cargo" placeholder="e.g. Apparel, Medical Devices, Auto Parts, Food Grade...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Capacity / Equipment</label>
+          <input class="form-input" id="f-capacity" placeholder="e.g. 15 trucks, 40,000 sq ft warehouse, 20/40 DRY, REEFER">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Languages</label>
+          <input class="form-input" id="f-lang" placeholder="e.g. English, Spanish, Portuguese">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">About Your Company (2-3 sentences)</label>
+          <textarea class="form-input" id="f-about" rows="3" placeholder="We specialize in..."></textarea>
+        </div>
+
+        <!-- SECTION 4: DOCUMENT UPLOADS -->
+        <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--teal);text-transform:uppercase;margin:14px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border2)">④ Verification Documents</div>
+        <div style="font-size:10px;color:var(--t3);margin-bottom:10px;line-height:1.5">Documents are reviewed by our team within 48 hours. Required items unlock your Verified badge and increase partner trust.</div>
+
+        <div class="form-group">
+          <label class="form-label">W-9 / Tax Form <span style="color:#ef4444">★ US Companies Required</span></label>
+          <div class="upload-zone" onclick="document.getElementById('f-w9').click()">
+            <div class="upload-icon">🧾</div>
+            <div class="upload-label">W-9 FORM (US) · TAX ID FORM (International)</div>
+            <div class="upload-sub">US companies: IRS W-9 · International: W-8BEN or equivalent · PDF only</div>
+          </div>
+          <input type="file" id="f-w9" style="display:none" accept=".pdf">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Cargo Insurance Certificate <span style="color:#ef4444">★ Required for Verified Badge</span></label>
+          <div class="upload-zone" onclick="document.getElementById('f-insurance').click()">
+            <div class="upload-icon">🛡</div>
+            <div class="upload-label">CARGO / FREIGHT LIABILITY INSURANCE</div>
+            <div class="upload-sub">Must show coverage amount, expiry date, and insured party · PDF or JPG</div>
+          </div>
+          <input type="file" id="f-insurance" style="display:none" accept=".pdf,.jpg,.png">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Business License / Company Registration <span style="color:var(--t3);font-size:9px">(Optional — increases trust score)</span></label>
+          <div class="upload-zone" onclick="document.getElementById('f-license').click()">
+            <div class="upload-icon">🏛</div>
+            <div class="upload-label">BUSINESS LICENSE OR ARTICLES OF INCORPORATION</div>
+            <div class="upload-sub">State/country business registration · PDF or JPG</div>
+          </div>
+          <input type="file" id="f-license" style="display:none" accept=".pdf,.jpg,.png">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Customs Bond / Broker License / FMC License <span style="color:var(--t3);font-size:9px">(If applicable)</span></label>
+          <div class="upload-zone" onclick="document.getElementById('f-bonds').click()">
+            <div class="upload-icon">🔒</div>
+            <div class="upload-label">CUSTOMS BOND · BROKER LICENSE · FMC / NVOCC LICENSE</div>
+            <div class="upload-sub">OTI license, customs broker license, surety bond — any applicable · PDF</div>
+          </div>
+          <input type="file" id="f-bonds" style="display:none" accept=".pdf,.jpg,.png">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Warehouse / Facility Certification <span style="color:var(--t3);font-size:9px">(If applicable)</span></label>
+          <div class="upload-zone" onclick="document.getElementById('f-cert').click()">
+            <div class="upload-icon">🏭</div>
+            <div class="upload-label">FDA REGISTRATION · GDP CERT · ISO CERT · C-TPAT</div>
+            <div class="upload-sub">Any relevant facility certification — unlocks specialty badge</div>
+          </div>
+          <input type="file" id="f-cert" style="display:none" accept=".pdf,.jpg,.png">
+        </div>
+
+        <!-- SECTION 5: TERMS -->
+        <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--teal);text-transform:uppercase;margin:14px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border2)">⑤ Agreement</div>
+        <div style="background:var(--surf3);border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:12px;font-size:10px;color:var(--t2);line-height:1.7;max-height:100px;overflow-y:auto">
+          By submitting this profile I confirm that all information provided is accurate. I agree that FreightSignal Connect is a partner matching platform and not a payment guarantee service. I understand that transactions between members are conducted directly and FreightSignal is not liable for payment disputes. I consent to my company profile being visible to other verified FSC members for the purpose of freight partner matching.
+        </div>
+        <label class="check-item" style="margin-bottom:12px">
+          <input type="checkbox" id="f-agree"> I agree to the FreightSignal Connect Member Terms
+        </label>
+
+        <button class="submit-btn" onclick="submitProfile()">✅ SUBMIT MY PROFILE — JOIN NETWORK</button>
+      </div>
+    </div>
+
+    <!-- SEARCH & FILTER -->
+    <div class="panel-title" style="margin-top:20px">Search Members</div>
+    <input class="search-input" placeholder="Search by company, city, country..." oninput="filterMembers(this.value)">
+
+    <div class="filter-section">
+      <div class="panel-title">Service Type</div>
+      <div class="filter-chips">
+        <button class="filter-chip on" onclick="toggleFilter(this,'all')">ALL</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'drayage')">Drayage</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'trucking')">Trucking</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'ocean')">Ocean</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'warehouse')">Warehouse</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'customs')">Customs</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'fulfillment')">Fulfillment</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'crossborder')">Cross-Border MX</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'reefer')">Cold Chain</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'pharma')">Pharma</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'nvocc')">NVOCC</button>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <div class="panel-title">Region</div>
+      <div class="filter-chips">
+        <button class="filter-chip on" onclick="toggleFilter(this,'all-region')">ALL</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'us')">United States</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'mexico')">Mexico</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'caribbean')">Caribbean</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'central-am')">Central America</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'latam')">South America</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'asia')">Asia</button>
+        <button class="filter-chip" onclick="toggleFilter(this,'europe')">Europe</button>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <div class="panel-title">Verified Only</div>
+      <div class="filter-chips">
+        <button class="filter-chip" onclick="toggleFilter(this,'verified')">✅ Verified Members Only</button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- AI MATCH BANNER -->
+    <div class="ai-match-banner">
+      <div class="ai-match-icon">🤖</div>
+      <div>
+        <div class="ai-match-text">
+          <strong>FreightSignal AI — Active Signal Match</strong>
+          HOT SIGNAL: Tesla Gigafactory Monterrey $2B expansion (96/100) — FreightSignal Connect found 4 members who can support this opportunity:
+        </div>
+        <div class="ai-match-tags">
+          <span class="ai-match-tag">🚛 2 Cross-Border MX Members</span>
+          <span class="ai-match-tag">🏭 1 Dallas Warehouse Member</span>
+          <span class="ai-match-tag">🚢 1 Gulf Coast NVOCC Member</span>
+          <span class="ai-match-tag">→ View Matches</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST BOARD -->
+    <div class="post-board">
+      <div class="post-board-title">📋 Partner Post Board — Live Needs & Offers</div>
+
+      <div class="post-item">
+        <span class="post-type post-need">NEED</span>
+        <div>
+          <div class="post-text">Reliable destination agent needed in San Pedro Sula, Honduras — apparel cargo, 3-4 containers/month, HS 6109. Looking for long-term relationship.</div>
+          <div class="post-meta">Posted by FSC Member · Dallas TX · 2 hrs ago</div>
+          <button class="post-reply" onclick="toast('Message sent to posting member')">💬 Reply</button>
+        </div>
+      </div>
+
+      <div class="post-item">
+        <span class="post-type post-offer">OFFER</span>
+        <div>
+          <div class="post-text">Offering cross-border trucking Monterrey → Laredo → Houston. 10 trucks available, FDA registered, reefer capable. Competitive rates, reliable transit.</div>
+          <div class="post-meta">Posted by FSC Member · Monterrey MX · 5 hrs ago</div>
+          <button class="post-reply" onclick="toast('Message sent to posting member')">💬 Reply</button>
+        </div>
+      </div>
+
+      <div class="post-item">
+        <span class="post-type post-need">NEED</span>
+        <div>
+          <div class="post-text">Need GDP-certified warehouse in Puerto Rico for pharmaceutical distribution. Minimum 5,000 sq ft, FDA registered, temperature controlled.</div>
+          <div class="post-meta">Posted by FSC Member · Miami FL · 1 day ago</div>
+          <button class="post-reply" onclick="toast('Message sent to posting member')">💬 Reply</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MEMBER DIRECTORY -->
+    <div class="results-header">
+      <div class="results-count" id="results-count">SHOWING 6 VERIFIED MEMBERS · SORTED BY: BEST MATCH</div>
+      <select class="sort-sel">
+        <option>Best Match</option>
+        <option>Most Recent</option>
+        <option>Most Verified</option>
+        <option>By Region</option>
+      </select>
+    </div>
+
+    <div class="member-grid" id="member-grid">
+
+      <!-- MEMBER 1 -->
+      <div class="member-card" style="--card-accent:#10b981">
+        <div class="card-top">
+          <div>
+            <div class="card-company">Gulf Coast Drayage LLC</div>
+            <div class="card-location">📍 Houston, TX — United States</div>
+          </div>
+          <div class="verified-badge">✅ VERIFIED</div>
+        </div>
+        <div class="card-services">
+          <span class="service-tag">Port Drayage</span>
+          <span class="service-tag">Cross-Dock</span>
+          <span class="service-tag">Container Storage</span>
+          <span class="service-tag special">Cross-Border MX</span>
+        </div>
+        <div class="card-lanes">
+          <div class="lanes-label">Trade Lanes</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>Houston / Galveston → US Inland</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>Monterrey MX → Laredo → Houston</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>Gulf Coast Distribution</div>
+        </div>
+        <div class="card-cargo">
+          <div class="cargo-label">Cargo Specialties</div>
+          <div class="cargo-tags">
+            <span class="cargo-tag">Dry FCL/LCL</span>
+            <span class="cargo-tag">Reefer</span>
+            <span class="cargo-tag">Hazmat</span>
+            <span class="cargo-tag">Auto Parts</span>
+          </div>
+        </div>
+        <div class="card-bottom">
+          <div>
+            <div class="card-lang">🌐 English · Spanish</div>
+            <div class="card-capacity">🚛 20 trucks · 50K sq ft</div>
+          </div>
+          <button class="connect-btn" onclick="openConnect('Gulf Coast Drayage LLC','Houston, TX')">💬 Connect</button>
+        </div>
+      </div>
+
+      <!-- MEMBER 2 -->
+      <div class="member-card" style="--card-accent:#00c8c8">
+        <div class="card-top">
+          <div>
+            <div class="card-company">Caribbean Freight Partners</div>
+            <div class="card-location">📍 San Juan, Puerto Rico</div>
+          </div>
+          <div class="verified-badge">✅ VERIFIED</div>
+        </div>
+        <div class="card-services">
+          <span class="service-tag">Destination Agent</span>
+          <span class="service-tag">Customs Clearance</span>
+          <span class="service-tag special">Ocean FCL/LCL</span>
+          <span class="service-tag">Last Mile PR</span>
+        </div>
+        <div class="card-lanes">
+          <div class="lanes-label">Trade Lanes</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>US East Coast → Puerto Rico</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>Puerto Rico → Dominican Republic</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>Caribbean Inter-Island</div>
+        </div>
+        <div class="card-cargo">
+          <div class="cargo-label">Cargo Specialties</div>
+          <div class="cargo-tags">
+            <span class="cargo-tag">Pharma / GDP</span>
+            <span class="cargo-tag">Medical Devices</span>
+            <span class="cargo-tag">Food Grade</span>
+            <span class="cargo-tag">Retail</span>
+          </div>
+        </div>
+        <div class="card-bottom">
+          <div>
+            <div class="card-lang">🌐 English · Spanish</div>
+            <div class="card-capacity">📦 NVOCC licensed · FDA registered</div>
+          </div>
+          <button class="connect-btn" onclick="openConnect('Caribbean Freight Partners','San Juan, PR')">💬 Connect</button>
+        </div>
+      </div>
+
+      <!-- MEMBER 3 -->
+      <div class="member-card" style="--card-accent:#8b5cf6">
+        <div class="card-top">
+          <div>
+            <div class="card-company">Monterrey Cross-Border Logistics</div>
+            <div class="card-location">📍 Monterrey, Nuevo León — Mexico</div>
+          </div>
+          <div class="verified-badge">✅ VERIFIED</div>
+        </div>
+        <div class="card-services">
+          <span class="service-tag special">Cross-Border MX</span>
+          <span class="service-tag">Customs (Mexico)</span>
+          <span class="service-tag">Maquiladora Logistics</span>
+          <span class="service-tag">Origin Consolidation</span>
+        </div>
+        <div class="card-lanes">
+          <div class="lanes-label">Trade Lanes</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>Monterrey → Laredo / McAllen</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>CDMX → US Border Crossings</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>Guadalajara → El Paso</div>
+        </div>
+        <div class="card-cargo">
+          <div class="cargo-label">Cargo Specialties</div>
+          <div class="cargo-tags">
+            <span class="cargo-tag">Auto Parts</span>
+            <span class="cargo-tag">Electronics</span>
+            <span class="cargo-tag">Apparel</span>
+            <span class="cargo-tag">Manufacturing</span>
+          </div>
+        </div>
+        <div class="card-bottom">
+          <div>
+            <div class="card-lang">🌐 Spanish · English</div>
+            <div class="card-capacity">🚛 35 trucks · Nearshoring specialist</div>
+          </div>
+          <button class="connect-btn" onclick="openConnect('Monterrey Cross-Border Logistics','Monterrey, MX')">💬 Connect</button>
+        </div>
+      </div>
+
+      <!-- MEMBER 4 -->
+      <div class="member-card" style="--card-accent:#10b981">
+        <div class="card-top">
+          <div>
+            <div class="card-company">JAX Warehouse & Fulfillment</div>
+            <div class="card-location">📍 Jacksonville, FL — United States</div>
+          </div>
+          <div class="verified-badge">✅ VERIFIED</div>
+        </div>
+        <div class="card-services">
+          <span class="service-tag special">Warehousing</span>
+          <span class="service-tag">Order Fulfillment</span>
+          <span class="service-tag">Cross-Docking</span>
+          <span class="service-tag">Pick & Pack</span>
+        </div>
+        <div class="card-lanes">
+          <div class="lanes-label">Trade Lanes</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>JAXPORT → Southeast US</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>Jacksonville Distribution Hub</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>Caribbean Inbound Gateway</div>
+        </div>
+        <div class="card-cargo">
+          <div class="cargo-label">Cargo Specialties</div>
+          <div class="cargo-tags">
+            <span class="cargo-tag">Consumer Goods</span>
+            <span class="cargo-tag">E-Commerce</span>
+            <span class="cargo-tag">Retail</span>
+            <span class="cargo-tag">Furniture</span>
+          </div>
+        </div>
+        <div class="card-bottom">
+          <div>
+            <div class="card-lang">🌐 English · Spanish</div>
+            <div class="card-capacity">🏭 120,000 sq ft · FDA registered</div>
+          </div>
+          <button class="connect-btn" onclick="openConnect('JAX Warehouse & Fulfillment','Jacksonville, FL')">💬 Connect</button>
+        </div>
+      </div>
+
+      <!-- MEMBER 5 -->
+      <div class="member-card" style="--card-accent:#f59e0b">
+        <div class="card-top">
+          <div>
+            <div class="card-company">Santo Domingo Customs & Logistics</div>
+            <div class="card-location">📍 Santo Domingo — Dominican Republic</div>
+          </div>
+          <div class="verified-badge">✅ VERIFIED</div>
+        </div>
+        <div class="card-services">
+          <span class="service-tag">Destination Agent</span>
+          <span class="service-tag special">Customs Clearance DR</span>
+          <span class="service-tag">FTZ Services</span>
+          <span class="service-tag">Last Mile DR</span>
+        </div>
+        <div class="card-lanes">
+          <div class="lanes-label">Trade Lanes</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>US East Coast → Puerto Caucedo</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>Puerto Caucedo → DR Interior</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>DR FTZ Logistics</div>
+        </div>
+        <div class="card-cargo">
+          <div class="cargo-label">Cargo Specialties</div>
+          <div class="cargo-tags">
+            <span class="cargo-tag">FTZ Inbound</span>
+            <span class="cargo-tag">Manufacturing</span>
+            <span class="cargo-tag">Apparel</span>
+            <span class="cargo-tag">Medical</span>
+          </div>
+        </div>
+        <div class="card-bottom">
+          <div>
+            <div class="card-lang">🌐 Spanish · English</div>
+            <div class="card-capacity">🏛 Licensed customs broker</div>
+          </div>
+          <button class="connect-btn" onclick="openConnect('Santo Domingo Customs','Santo Domingo, DR')">💬 Connect</button>
+        </div>
+      </div>
+
+      <!-- MEMBER 6 -->
+      <div class="member-card" style="--card-accent:#3b82f6">
+        <div class="card-top">
+          <div>
+            <div class="card-company">Pacific Northwest Freight Co.</div>
+            <div class="card-location">📍 Portland, OR — United States</div>
+          </div>
+          <div class="verified-badge">✅ VERIFIED</div>
+        </div>
+        <div class="card-services">
+          <span class="service-tag special">Ocean FCL/LCL</span>
+          <span class="service-tag">Port Drayage</span>
+          <span class="service-tag">NVOCC</span>
+          <span class="service-tag">Customs Clearance</span>
+        </div>
+        <div class="card-lanes">
+          <div class="lanes-label">Trade Lanes</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>Asia → Portland / Seattle</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>Portland → US Midwest / South</div>
+          <div class="lane-item"><span class="lane-arrow">→</span>Pacific Northwest Distribution</div>
+        </div>
+        <div class="card-cargo">
+          <div class="cargo-label">Cargo Specialties</div>
+          <div class="cargo-tags">
+            <span class="cargo-tag">Electronics</span>
+            <span class="cargo-tag">Consumer Goods</span>
+            <span class="cargo-tag">Forest Products</span>
+            <span class="cargo-tag">Agricultural</span>
+          </div>
+        </div>
+        <div class="card-bottom">
+          <div>
+            <div class="card-lang">🌐 English · Mandarin</div>
+            <div class="card-capacity">🚢 NVOCC · 25 years experience</div>
+          </div>
+          <button class="connect-btn" onclick="openConnect('Pacific Northwest Freight Co.','Portland, OR')">💬 Connect</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- CONNECT MODAL -->
+<div class="modal-overlay" id="connectModal" onclick="if(event.target===this)closeConnect()">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">💬 Connect with Partner</div>
+      <button class="modal-close" onclick="closeConnect()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-company" id="modal-company">Company Name</div>
+      <div class="modal-location" id="modal-location">Location</div>
+      <div class="modal-section">
+        <div class="modal-section-title">Your Message</div>
+        <textarea class="modal-textarea" id="modal-message" placeholder="Hi, I found your profile on FreightSignal Connect. I'm looking for a partner on the [lane] for [cargo type]. We handle approximately [X] containers per month. Would love to discuss a potential partnership..."></textarea>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Your Contact Info</div>
+        <input class="form-input" style="margin-bottom:8px" placeholder="Your name">
+        <input class="form-input" style="margin-bottom:8px" placeholder="Your company">
+        <input class="form-input" type="email" placeholder="Your email">
+      </div>
+      <button class="modal-send-btn" onclick="sendConnect()">✅ SEND CONNECTION REQUEST</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.style.display = 'block';
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.style.display = 'none', 3000);
+}
+
+function openConnect(company, location) {
+  document.getElementById('modal-company').textContent = company;
+  document.getElementById('modal-location').textContent = '📍 ' + location;
+  document.getElementById('modal-message').value = '';
+  document.getElementById('connectModal').classList.add('open');
+}
+
+function closeConnect() {
+  document.getElementById('connectModal').classList.remove('open');
+}
+
+function sendConnect() {
+  closeConnect();
+  toast('✅ Connection request sent! Member will reply to your email within 24 hrs.');
+}
+
+function submitProfile() {
+  const company = document.getElementById('f-company').value;
+  const email = document.getElementById('f-email').value;
+  if (!company || !email) { toast('Please enter company name and email'); return; }
+  toast('✅ Profile submitted! We will verify your docs and add you to the network within 48 hrs.');
+}
+
+function toggleFilter(btn, filter) {
+  if (filter === 'all' || filter === 'all-region') {
+    btn.closest('.filter-chips').querySelectorAll('.filter-chip').forEach(b => b.classList.remove('on'));
+  } else {
+    btn.closest('.filter-chips').querySelectorAll('[onclick*="all"]').forEach(b => b.classList.remove('on'));
+  }
+  btn.classList.toggle('on');
+  toast('Filter applied — ' + btn.textContent.trim());
+}
+
+function filterMembers(query) {
+  const cards = document.querySelectorAll('.member-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const text = card.textContent.toLowerCase();
+    const show = !query || text.includes(query.toLowerCase());
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  document.getElementById('results-count').textContent = `SHOWING ${visible} MEMBERS`;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeConnect();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreightSignal Connect — Exclusive Freight Partner Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060e12;--surf:#0a1a20;--surf2:#0f2530;--surf3:#142e38;
+  --teal:#00c8c8;--teal2:#009898;--teal3:#28e0e0;--teal4:rgba(0,200,200,0.08);
+  --t1:#e8f4f6;--t2:#7ab0b8;--t3:#3d6870;
+  --border:rgba(0,200,200,0.08);--border2:rgba(0,200,200,0.22);
+  --green:#10b981;--amber:#f59e0b;--red:#ef4444;--purple:#8b5cf6;
+  --ff:"Inter",sans-serif;--fm:"JetBrains Mono",monospace;
+  --glow:0 0 20px rgba(0,200,200,0.15);
+}
+html,body{background:var(--bg);color:var(--t1);font-family:var(--ff);min-height:100vh}
+
+/* TOPBAR */
+.topbar{background:linear-gradient(90deg,#040c0f,#060e12);border-bottom:1px solid var(--border2);padding:0 32px;display:flex;align-items:center;gap:16px;height:60px;position:sticky;top:0;z-index:100;position:relative}
+.topbar::after{content:"";position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--teal),transparent)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-name{font-size:18px;font-weight:900;letter-spacing:-.5px}
+.brand-name em{color:var(--teal);font-style:normal}
+.brand-connect{font-size:18px;font-weight:900;color:var(--green)}
+.brand-sub{font-family:var(--fm);font-size:7px;letter-spacing:2.5px;color:var(--t3);display:block;margin-top:2px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.verified-chip{font-family:var(--fm);font-size:8px;color:var(--green);border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.06);padding:4px 12px;border-radius:3px}
+.btn-claim{background:linear-gradient(135deg,#059669,#10b981);border:none;border-radius:5px;color:#fff;font-family:var(--fm);font-size:10px;font-weight:700;padding:8px 18px;cursor:pointer;letter-spacing:.5px}
+.back-link{font-family:var(--fm);font-size:9px;color:var(--t3);text-decoration:none;letter-spacing:.5px}
+.back-link:hover{color:var(--teal)}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0a1e28,#0f2530);border-bottom:1px solid var(--border2);padding:40px 32px;text-align:center}
+.hero-badge{font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--green);border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.06);padding:4px 14px;border-radius:3px;display:inline-block;margin-bottom:16px}
+.hero-h1{font-size:32px;font-weight:900;margin-bottom:10px;line-height:1.1}
+.hero-h1 span{color:var(--teal)}
+.hero-sub{font-size:14px;color:var(--t2);max-width:640px;margin:0 auto 24px;line-height:1.7}
+.hero-stats{display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap;margin-top:24px}
+.hero-stat{text-align:center}
+.hero-stat-val{font-size:24px;font-weight:900;color:var(--green)}
+.hero-stat-lbl{font-family:var(--fm);font-size:8px;letter-spacing:1px;color:var(--t3);margin-top:3px}
+
+/* HOW IT WORKS */
+.how-section{padding:48px 32px;border-bottom:1px solid var(--border)}
+.section-label{font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--teal);text-transform:uppercase;text-align:center;margin-bottom:12px}
+.section-h2{font-size:24px;font-weight:900;text-align:center;margin-bottom:32px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:900px;margin:0 auto}
+.step{background:var(--surf);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center;position:relative}
+.step-num{font-family:var(--fm);font-size:32px;font-weight:900;color:rgba(0,200,200,0.1);position:absolute;top:10px;right:12px;line-height:1}
+.step-icon{font-size:24px;margin-bottom:10px}
+.step-title{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.step-desc{font-size:11px;color:var(--t2);line-height:1.6}
+.step-arrow{display:flex;align-items:center;justify-content:center;color:var(--teal);font-size:20px;padding-top:40px}
+
+/* TERRITORY GRID */
+.territory-section{padding:48px 32px;border-bottom:1px solid var(--border)}
+.territory-intro{max-width:700px;margin:0 auto 32px;text-align:center;font-size:13px;color:var(--t2);line-height:1.7}
+.territory-intro strong{color:var(--t1)}
+.territory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;max-width:1100px;margin:0 auto}
+
+/* Territory card */
+.territory-card{border-radius:8px;padding:16px;border:1px solid;position:relative;overflow:hidden}
+.territory-card.taken{background:rgba(16,185,129,0.04);border-color:rgba(16,185,129,0.25)}
+.territory-card.open{background:rgba(0,200,200,0.03);border-color:var(--border2);cursor:pointer;transition:all .2s}
+.territory-card.open:hover{border-color:var(--teal);background:var(--teal4);transform:translateY(-2px)}
+.territory-card.coming{background:rgba(139,92,246,0.04);border-color:rgba(139,92,246,0.2)}
+.tc-status{font-family:var(--fm);font-size:7px;font-weight:700;padding:2px 8px;border-radius:2px;display:inline-block;margin-bottom:10px;letter-spacing:1px}
+.status-taken{background:rgba(16,185,129,0.12);color:var(--green);border:1px solid rgba(16,185,129,0.3)}
+.status-open{background:rgba(0,200,200,0.1);color:var(--teal);border:1px solid rgba(0,200,200,0.3)}
+.status-coming{background:rgba(139,92,246,0.1);color:#a78bfa;border:1px solid rgba(139,92,246,0.3)}
+.tc-flag{font-size:20px;margin-bottom:6px;display:block}
+.tc-market{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:2px}
+.tc-service{font-family:var(--fm);font-size:9px;color:var(--t2);margin-bottom:8px;letter-spacing:.3px}
+.tc-member{font-size:11px;color:var(--green);font-weight:600}
+.tc-open-txt{font-size:11px;color:var(--teal)}
+.tc-claim-btn{margin-top:10px;width:100%;padding:7px;border-radius:4px;border:1px solid var(--teal);background:transparent;color:var(--teal);font-family:var(--fm);font-size:9px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.5px}
+.tc-claim-btn:hover{background:var(--teal);color:var(--bg)}
+.exclusive-seal{position:absolute;top:12px;right:12px;font-size:16px}
+
+/* USE CASES */
+.usecase-section{padding:48px 32px;border-bottom:1px solid var(--border)}
+.usecases{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1000px;margin:0 auto}
+.usecase{background:var(--surf);border:1px solid var(--border);border-radius:8px;padding:20px}
+.usecase-icon{font-size:24px;margin-bottom:10px}
+.usecase-title{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:8px}
+.usecase-flow{display:flex;flex-direction:column;gap:6px}
+.flow-step{display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--t2);line-height:1.5}
+.flow-num{font-family:var(--fm);font-size:9px;color:var(--teal);font-weight:700;flex-shrink:0;margin-top:1px}
+.flow-result{margin-top:10px;padding:8px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:4px;font-family:var(--fm);font-size:9px;color:var(--green);letter-spacing:.3px}
+
+/* VETTING */
+.vetting-section{padding:48px 32px;border-bottom:1px solid var(--border);text-align:center}
+.vetting-box{max-width:700px;margin:0 auto;background:var(--surf);border:1px solid var(--border2);border-radius:10px;padding:28px}
+.vetting-title{font-size:18px;font-weight:800;color:var(--t1);margin-bottom:8px}
+.vetting-sub{font-size:13px;color:var(--t2);margin-bottom:20px;line-height:1.6}
+.vetting-steps{display:flex;flex-direction:column;gap:10px;text-align:left}
+.vetting-step{display:flex;align-items:center;gap:12px;padding:10px;background:var(--surf2);border-radius:5px}
+.vetting-step-icon{font-size:18px;flex-shrink:0}
+.vetting-step-text{font-size:12px;color:var(--t2);line-height:1.5}
+.vetting-step-text strong{color:var(--t1)}
+.fsc-badge{display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:8px 16px;border-radius:5px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);font-family:var(--fm);font-size:9px;color:var(--green);letter-spacing:1px}
+
+/* APPLICATION FORM */
+.apply-section{padding:48px 32px;background:var(--surf)}
+.apply-inner{max-width:700px;margin:0 auto}
+.apply-title{font-size:24px;font-weight:900;margin-bottom:8px;text-align:center}
+.apply-sub{font-size:13px;color:var(--t2);text-align:center;margin-bottom:32px;line-height:1.6}
+.form-section-title{font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--teal);text-transform:uppercase;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border2)}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-group{margin-bottom:12px}
+.form-label{display:block;font-family:var(--fm);font-size:8px;letter-spacing:1px;color:var(--t3);text-transform:uppercase;margin-bottom:5px}
+.form-label .req{color:var(--red)}
+.form-input{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:4px;color:var(--t1);font-family:var(--ff);font-size:12px;padding:9px 11px;outline:none;transition:all .15s}
+.form-input:focus{border-color:var(--teal);box-shadow:0 0 0 2px rgba(0,200,200,0.08)}
+.form-input::placeholder{color:var(--t3)}
+.form-select{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:4px;color:var(--t1);font-family:var(--ff);font-size:12px;padding:9px 11px;outline:none;cursor:pointer}
+.form-select option{background:var(--surf2)}
+.form-textarea{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:4px;color:var(--t1);font-family:var(--ff);font-size:12px;padding:9px 11px;outline:none;resize:vertical;min-height:80px}
+.check-group{display:flex;flex-direction:column;gap:7px}
+.check-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t2);cursor:pointer}
+.check-item input{accent-color:var(--teal)}
+.upload-zone{border:1px dashed var(--border2);border-radius:5px;padding:14px;text-align:center;cursor:pointer;transition:all .15s;margin-bottom:8px}
+.upload-zone:hover{border-color:var(--teal);background:var(--teal4)}
+.upload-icon{font-size:20px;margin-bottom:5px}
+.upload-lbl{font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.5px}
+.upload-sub{font-size:10px;color:var(--t3);margin-top:2px}
+.req-badge{font-family:var(--fm);font-size:7px;color:var(--red);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1px 6px;border-radius:2px;margin-left:6px}
+.opt-badge{font-family:var(--fm);font-size:7px;color:var(--t3);background:var(--surf3);border:1px solid var(--border);padding:1px 6px;border-radius:2px;margin-left:6px}
+.terms-box{background:var(--surf2);border:1px solid var(--border);border-radius:4px;padding:12px;font-size:10px;color:var(--t3);line-height:1.7;max-height:90px;overflow-y:auto;margin-bottom:10px}
+.submit-btn{width:100%;padding:12px;border-radius:6px;border:none;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-family:var(--fm);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s;margin-top:8px}
+.submit-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(16,185,129,0.3)}
+.ai-note{background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.2);border-radius:5px;padding:12px;font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start}
+.ai-note-icon{font-size:18px;flex-shrink:0}
+
+/* Post board */
+.board-section{padding:48px 32px;border-bottom:1px solid var(--border)}
+.board-inner{max-width:900px;margin:0 auto}
+.post-tabs{display:flex;gap:8px;margin-bottom:20px}
+.post-tab{font-family:var(--fm);font-size:9px;padding:6px 14px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;letter-spacing:.5px}
+.post-tab.on{background:var(--teal4);border-color:var(--teal);color:var(--teal);font-weight:700}
+.post-new{width:100%;padding:10px;border-radius:5px;border:1px dashed var(--border2);background:transparent;color:var(--t3);font-family:var(--fm);font-size:9px;cursor:pointer;letter-spacing:.5px;margin-bottom:16px;transition:all .15s}
+.post-new:hover{border-color:var(--teal);color:var(--teal)}
+.post-item{background:var(--surf);border:1px solid var(--border);border-radius:7px;padding:14px;margin-bottom:10px}
+.post-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.post-type-badge{font-family:var(--fm);font-size:7px;font-weight:700;padding:3px 8px;border-radius:2px;white-space:nowrap;flex-shrink:0}
+.badge-need{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25)}
+.badge-offer{background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.25)}
+.post-title{font-size:12px;font-weight:600;color:var(--t1)}
+.post-body{font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:8px}
+.post-foot{display:flex;align-items:center;justify-content:space-between}
+.post-meta{font-family:var(--fm);font-size:8px;color:var(--t3)}
+.post-reply-btn{font-family:var(--fm);font-size:8px;color:var(--teal);background:transparent;border:1px solid var(--border2);padding:4px 10px;border-radius:3px;cursor:pointer;transition:all .15s}
+.post-reply-btn:hover{border-color:var(--teal)}
+
+/* Toast */
+#toast{position:fixed;bottom:20px;right:20px;z-index:9999;background:var(--surf2);border:1px solid var(--border2);border-radius:5px;padding:10px 18px;font-family:var(--fm);font-size:10px;color:var(--teal);display:none;box-shadow:var(--glow)}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--surf)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <svg width="28" height="28" viewBox="0 0 44 44" fill="none">
+      <path d="M22 2C14.268 2 8 8.268 8 16c0 10 14 26 14 26s14-16 14-26C36 8.268 29.732 2 22 2z" fill="none" stroke="#00C8C8" stroke-width="2.2"/>
+      <circle cx="22" cy="16" r="2" fill="#00C8C8"/>
+      <line x1="22" y1="14" x2="22" y2="10" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="22" y1="10" x2="17" y2="10" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="17" cy="10" r="1.5" fill="#00C8C8"/>
+      <line x1="22" y1="10" x2="27" y2="10" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="27" cy="10" r="1.5" fill="#00C8C8"/>
+      <line x1="22" y1="18" x2="22" y2="22" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="22" y1="22" x2="17" y2="22" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="17" cy="22" r="1.5" fill="#00C8C8"/>
+      <line x1="22" y1="22" x2="27" y2="22" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="27" cy="22" r="1.5" fill="#00C8C8"/>
+    </svg>
+    <div>
+      <div class="brand-name">Freight<em>Signal</em> <span class="brand-connect">Connect</span></div>
+      <span class="brand-sub">EXCLUSIVE VERIFIED FREIGHT PARTNER NETWORK</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="verified-chip">🛡 FSC Intelligence Verified</div>
+    <a href="/" class="back-link">← freightsignal.net</a>
+    <button class="btn-claim" onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})">Claim Your Territory →</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">ONE PROVIDER PER SERVICE PER MARKET · ALWAYS FREE · FSC INTELLIGENCE VERIFIED</div>
+  <h1 class="hero-h1">The Freight Partner Network<br>Built on <span>Exclusivity</span>, Not Annual Fees</h1>
+  <p class="hero-sub">FreightSignal Connect gives each market one exclusive verified provider per service type. No competition within the network. AI matches every request directly to you. Free with your FreightSignal subscription.</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-val">1</div>
+      <div class="hero-stat-lbl">PROVIDER PER MARKET</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">$0</div>
+      <div class="hero-stat-lbl">ANNUAL FEE</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">FSC</div>
+      <div class="hero-stat-lbl">INTELLIGENCE VERIFIED</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">Direct</div>
+      <div class="hero-stat-lbl">MEMBER TO MEMBER</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-section">
+  <div class="section-label">How It Works</div>
+  <h2 class="section-h2">Find Your Partner. Connect Direct. No Middleman.</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-icon">🗺</div>
+      <div class="step-title">Claim Your Territory</div>
+      <div class="step-desc">Apply for exclusive rights to your market and service type. One provider per region — first approved wins that territory.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-icon">🛡</div>
+      <div class="step-title">FSC Intelligence Review</div>
+      <div class="step-desc">Our team reviews your application, verifies your insurance and business docs, and approves your exclusive territory within 48 hours.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-icon">🤖</div>
+      <div class="step-title">AI Matches You</div>
+      <div class="step-desc">Every FreightSignal HOT signal that touches your lane is matched to you automatically. Members searching your service see you first — and only you.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-icon">🤝</div>
+      <div class="step-title">Connect & Transact Direct</div>
+      <div class="step-desc">Members contact you directly. You quote, negotiate, and transact independently. FSC never touches the transaction — zero fees, zero splits.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TERRITORY GRID -->
+<div class="territory-section" id="territories">
+  <div class="section-label">Territory Map</div>
+  <h2 class="section-h2">Claim Your Market Before Someone Else Does</h2>
+  <div class="territory-intro">
+    Each territory shows <strong>one exclusive provider</strong> per service type. Green = taken. Teal = open. Claim an open territory before another provider in your market applies.
+  </div>
+  <div class="territory-grid">
+
+    <!-- TAKEN -->
+    <div class="territory-card taken">
+      <span class="exclusive-seal">🛡</span>
+      <span class="tc-flag">🇲🇽</span>
+      <span class="tc-status status-taken">✅ EXCLUSIVE MEMBER</span>
+      <div class="tc-market">Mexico — National</div>
+      <div class="tc-service">CROSS-BORDER TRUCKING · WAREHOUSING</div>
+      <div class="tc-member">FSC Intelligence Verified Member</div>
+    </div>
+
+    <div class="territory-card taken">
+      <span class="exclusive-seal">🛡</span>
+      <span class="tc-flag">🇵🇷</span>
+      <span class="tc-status status-taken">✅ EXCLUSIVE MEMBER</span>
+      <div class="tc-market">Puerto Rico</div>
+      <div class="tc-service">DESTINATION TRUCKING · CUSTOMS</div>
+      <div class="tc-member">FSC Intelligence Verified Member</div>
+    </div>
+
+    <div class="territory-card taken">
+      <span class="exclusive-seal">🛡</span>
+      <span class="tc-flag">🇺🇸</span>
+      <span class="tc-status status-taken">✅ EXCLUSIVE MEMBER</span>
+      <div class="tc-market">Jacksonville, FL</div>
+      <div class="tc-service">WAREHOUSING · FULFILLMENT · DRAYAGE</div>
+      <div class="tc-member">FSC Intelligence Verified Member</div>
+    </div>
+
+    <div class="territory-card taken">
+      <span class="exclusive-seal">🛡</span>
+      <span class="tc-flag">🇩🇴</span>
+      <span class="tc-status status-taken">✅ EXCLUSIVE MEMBER</span>
+      <div class="tc-market">Dominican Republic</div>
+      <div class="tc-service">CUSTOMS CLEARANCE · FTZ SERVICES</div>
+      <div class="tc-member">FSC Intelligence Verified Member</div>
+    </div>
+
+    <div class="territory-card taken">
+      <span class="exclusive-seal">🛡</span>
+      <span class="tc-flag">🇺🇸</span>
+      <span class="tc-status status-taken">✅ EXCLUSIVE MEMBER</span>
+      <div class="tc-market">Dallas, TX</div>
+      <div class="tc-service">DOMESTIC TRUCKING · DISTRIBUTION</div>
+      <div class="tc-member">FSC Intelligence Verified Member</div>
+    </div>
+
+    <div class="territory-card taken">
+      <span class="exclusive-seal">🛡</span>
+      <span class="tc-flag">🇺🇸</span>
+      <span class="tc-status status-taken">✅ EXCLUSIVE MEMBER</span>
+      <div class="tc-market">Portland, OR</div>
+      <div class="tc-service">OCEAN FREIGHT · NVOCC · PORT DRAYAGE</div>
+      <div class="tc-member">FSC Intelligence Verified Member</div>
+    </div>
+
+    <!-- OPEN -->
+    <div class="territory-card open" onclick="claimTerritory('Houston, TX — Port Drayage')">
+      <span class="tc-flag">🇺🇸</span>
+      <span class="tc-status status-open">🔵 OPEN — 1 SPOT</span>
+      <div class="tc-market">Houston, TX</div>
+      <div class="tc-service">PORT DRAYAGE · CONTAINER HANDLING</div>
+      <div class="tc-open-txt">No exclusive member yet</div>
+      <button class="tc-claim-btn">Claim This Territory →</button>
+    </div>
+
+    <div class="territory-card open" onclick="claimTerritory('Miami, FL — Origin & Forwarding')">
+      <span class="tc-flag">🇺🇸</span>
+      <span class="tc-status status-open">🔵 OPEN — 1 SPOT</span>
+      <div class="tc-market">Miami, FL</div>
+      <div class="tc-service">FREIGHT FORWARDING · CUSTOMS</div>
+      <div class="tc-open-txt">No exclusive member yet</div>
+      <button class="tc-claim-btn">Claim This Territory →</button>
+    </div>
+
+    <div class="territory-card open" onclick="claimTerritory('Brazil — Origin Agent & Ocean')">
+      <span class="tc-flag">🇧🇷</span>
+      <span class="tc-status status-open">🔵 OPEN — 1 SPOT</span>
+      <div class="tc-market">Brazil — National</div>
+      <div class="tc-service">ORIGIN AGENT · OCEAN FREIGHT</div>
+      <div class="tc-open-txt">No exclusive member yet</div>
+      <button class="tc-claim-btn">Claim This Territory →</button>
+    </div>
+
+    <div class="territory-card open" onclick="claimTerritory('Costa Rica — Destination & Customs')">
+      <span class="tc-flag">🇨🇷</span>
+      <span class="tc-status status-open">🔵 OPEN — 1 SPOT</span>
+      <div class="tc-market">Costa Rica</div>
+      <div class="tc-service">DESTINATION AGENT · CUSTOMS</div>
+      <div class="tc-open-txt">No exclusive member yet</div>
+      <button class="tc-claim-btn">Claim This Territory →</button>
+    </div>
+
+    <div class="territory-card open" onclick="claimTerritory('Honduras — Port & Destination')">
+      <span class="tc-flag">🇭🇳</span>
+      <span class="tc-status status-open">🔵 OPEN — 1 SPOT</span>
+      <div class="tc-market">Honduras</div>
+      <div class="tc-service">PUERTO CORTÉS · DESTINATION AGENT</div>
+      <div class="tc-open-txt">No exclusive member yet</div>
+      <button class="tc-claim-btn">Claim This Territory →</button>
+    </div>
+
+    <div class="territory-card open" onclick="claimTerritory('Guatemala — Origin & Customs')">
+      <span class="tc-flag">🇬🇹</span>
+      <span class="tc-status status-open">🔵 OPEN — 1 SPOT</span>
+      <div class="tc-market">Guatemala</div>
+      <div class="tc-service">ORIGIN · PUERTO QUETZAL · CUSTOMS</div>
+      <div class="tc-open-txt">No exclusive member yet</div>
+      <button class="tc-claim-btn">Claim This Territory →</button>
+    </div>
+
+    <div class="territory-card open" onclick="claimTerritory('Los Angeles, CA — Drayage & Warehouse')">
+      <span class="tc-flag">🇺🇸</span>
+      <span class="tc-status status-open">🔵 OPEN — 1 SPOT</span>
+      <div class="tc-market">Los Angeles, CA</div>
+      <div class="tc-service">PORT DRAYAGE · WAREHOUSING</div>
+      <div class="tc-open-txt">No exclusive member yet</div>
+      <button class="tc-claim-btn">Claim This Territory →</button>
+    </div>
+
+    <div class="territory-card open" onclick="claimTerritory('Panama — Canal Zone & Destination')">
+      <span class="tc-flag">🇵🇦</span>
+      <span class="tc-status status-open">🔵 OPEN — 1 SPOT</span>
+      <div class="tc-market">Panama</div>
+      <div class="tc-service">CANAL ZONE · DESTINATION AGENT</div>
+      <div class="tc-open-txt">No exclusive member yet</div>
+      <button class="tc-claim-btn">Claim This Territory →</button>
+    </div>
+
+    <div class="territory-card open" onclick="claimTerritory('Colombia — Origin & Ocean')">
+      <span class="tc-flag">🇨🇴</span>
+      <span class="tc-status status-open">🔵 OPEN — 1 SPOT</span>
+      <div class="tc-market">Colombia</div>
+      <div class="tc-service">ORIGIN AGENT · OCEAN FREIGHT</div>
+      <div class="tc-open-txt">No exclusive member yet</div>
+      <button class="tc-claim-btn">Claim This Territory →</button>
+    </div>
+
+    <!-- COMING SOON -->
+    <div class="territory-card coming">
+      <span class="tc-flag">🇨🇳</span>
+      <span class="tc-status status-coming">⏳ COMING SOON</span>
+      <div class="tc-market">China — Shanghai / Shenzhen</div>
+      <div class="tc-service">ORIGIN CONSOLIDATION · OCEAN</div>
+      <div style="font-size:10px;color:var(--t3);margin-top:6px">Opening Q1 2027 — join waitlist</div>
+    </div>
+
+    <div class="territory-card coming">
+      <span class="tc-flag">🇻🇳</span>
+      <span class="tc-status status-coming">⏳ COMING SOON</span>
+      <div class="tc-market">Vietnam — Ho Chi Minh / Hanoi</div>
+      <div class="tc-service">ORIGIN AGENT · EXPORT</div>
+      <div style="font-size:10px;color:var(--t3);margin-top:6px">Opening Q1 2027 — join waitlist</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- USE CASES -->
+<div class="usecase-section">
+  <div class="section-label">How Members Use FSC</div>
+  <h2 class="section-h2">Real Scenarios. Direct Connections.</h2>
+  <div class="usecases">
+
+    <div class="usecase">
+      <div class="usecase-icon">🚢</div>
+      <div class="usecase-title">Need Brazil Origin Agent for FCL</div>
+      <div class="usecase-flow">
+        <div class="flow-step"><span class="flow-num">1</span>Rep in Jacksonville has FCL cargo moving Santos → JAXPORT</div>
+        <div class="flow-step"><span class="flow-num">2</span>Opens FSC → searches Brazil Origin Agent</div>
+        <div class="flow-step"><span class="flow-num">3</span>One exclusive verified member appears — Santos, Brazil</div>
+        <div class="flow-step"><span class="flow-num">4</span>Clicks Connect → sends WhatsApp or email directly</div>
+        <div class="flow-step"><span class="flow-num">5</span>Partner quotes origin charges + CY/CY rate to JAXPORT</div>
+      </div>
+      <div class="flow-result">✅ Deal done. Zero FSC fees. Zero profit splits.</div>
+    </div>
+
+    <div class="usecase">
+      <div class="usecase-icon">🚛</div>
+      <div class="usecase-title">Need Mexico Cross-Border Trucker</div>
+      <div class="usecase-flow">
+        <div class="flow-step"><span class="flow-num">1</span>FreightSignal HOT signal: Tesla Monterrey expansion 96/100</div>
+        <div class="flow-step"><span class="flow-num">2</span>FSC AI auto-surfaces: exclusive Mexico member covers Monterrey → Laredo</div>
+        <div class="flow-step"><span class="flow-num">3</span>Rep connects with Mexico FSC member directly</div>
+        <div class="flow-step"><span class="flow-num">4</span>Together they pitch Tesla — rep handles US side, partner handles MX</div>
+      </div>
+      <div class="flow-result">✅ Signal becomes a complete solution in 60 seconds.</div>
+    </div>
+
+    <div class="usecase">
+      <div class="usecase-icon">🏭</div>
+      <div class="usecase-title">Need LAX Warehouse for West Coast DC</div>
+      <div class="usecase-flow">
+        <div class="flow-step"><span class="flow-num">1</span>Rep's customer needs West Coast distribution from Asia imports</div>
+        <div class="flow-step"><span class="flow-num">2</span>Searches FSC: Los Angeles Warehousing</div>
+        <div class="flow-step"><span class="flow-num">3</span>One exclusive verified member — Carson, CA, 80K sq ft, FDA registered</div>
+        <div class="flow-step"><span class="flow-num">4</span>Connect → quote → customer has complete solution</div>
+      </div>
+      <div class="flow-result">✅ Rep closed warehousing + ocean in one call.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- VETTING SECTION -->
+<div class="vetting-section">
+  <div class="section-label">FSC Intelligence Review</div>
+  <h2 class="section-h2" style="margin-bottom:24px">Every Member Is Verified Before Approval</h2>
+  <div class="vetting-box">
+    <div class="vetting-title">How FSC Intelligence Review Works</div>
+    <div class="vetting-sub">Applications are reviewed by our network team. We verify every member personally before granting exclusive territory rights. This keeps FSC a curated professional network — not a paid directory.</div>
+    <div class="vetting-steps">
+      <div class="vetting-step">
+        <div class="vetting-step-icon">📋</div>
+        <div class="vetting-step-text"><strong>Step 1 — Application Submitted</strong><br>You submit your company profile, service area, and trade lanes through the form below.</div>
+      </div>
+      <div class="vetting-step">
+        <div class="vetting-step-icon">📄</div>
+        <div class="vetting-step-text"><strong>Step 2 — Document Verification</strong><br>Cargo insurance certificate, business license, and applicable licenses (customs bond, NVOCC, broker) reviewed by FSC Intelligence team.</div>
+      </div>
+      <div class="vetting-step">
+        <div class="vetting-step-icon">📞</div>
+        <div class="vetting-step-text"><strong>Step 3 — Brief Qualification Call</strong><br>15-minute call with our network team to confirm your specialty, capacity, and territory. We want to know your operation, not just your paperwork.</div>
+      </div>
+      <div class="vetting-step">
+        <div class="vetting-step-icon">🛡</div>
+        <div class="vetting-step-text"><strong>Step 4 — Exclusive Territory Granted</strong><br>Approved members receive exclusive territory rights and the FSC Intelligence Verified badge. AI matching activates immediately.</div>
+      </div>
+    </div>
+    <div class="fsc-badge">🛡 FSC INTELLIGENCE VERIFIED — Reviewed · Approved · Exclusive</div>
+  </div>
+</div>
+
+<!-- PARTNER BOARD -->
+<div class="board-section">
+  <div class="board-inner">
+    <div class="section-label">Partner Board</div>
+    <h2 class="section-h2" style="margin-bottom:20px">Live Member Needs & Offers</h2>
+    <div class="post-tabs">
+      <button class="post-tab on">All Posts</button>
+      <button class="post-tab">Needs</button>
+      <button class="post-tab">Offers</button>
+    </div>
+    <button class="post-new" onclick="toast('Post board available to verified FSC members')">+ Post a Need or Offer (Verified Members Only)</button>
+
+    <div class="post-item">
+      <div class="post-head">
+        <span class="post-type-badge badge-need">NEED</span>
+        <div class="post-title">Destination agent — San Pedro Sula, Honduras · Apparel FCL</div>
+      </div>
+      <div class="post-body">Handling 3-4 FCL containers/month of apparel (HS 6109) through Puerto Cortés. Need a reliable destination agent for customs clearance and inland delivery. Long-term relationship preferred.</div>
+      <div class="post-foot">
+        <div class="post-meta">FSC Member · Dallas TX · 2 hrs ago · 🛡 Verified</div>
+        <button class="post-reply-btn" onclick="toast('Connect request sent — member will reply within 24hrs')">💬 Connect</button>
+      </div>
+    </div>
+
+    <div class="post-item">
+      <div class="post-head">
+        <span class="post-type-badge badge-offer">OFFER</span>
+        <div class="post-title">Cross-border trucking Monterrey → Laredo · Available capacity</div>
+      </div>
+      <div class="post-body">10 trucks available on Monterrey → Laredo corridor. FDA registered, reefer capable. Competitive spot and contract rates. Experienced with maquiladora and nearshoring cargo.</div>
+      <div class="post-foot">
+        <div class="post-meta">FSC Exclusive Member · Mexico · 5 hrs ago · 🛡 Verified</div>
+        <button class="post-reply-btn" onclick="toast('Connect request sent — member will reply within 24hrs')">💬 Connect</button>
+      </div>
+    </div>
+
+    <div class="post-item">
+      <div class="post-head">
+        <span class="post-type-badge badge-need">NEED</span>
+        <div class="post-title">GDP-certified warehouse Puerto Rico · Pharmaceutical distribution</div>
+      </div>
+      <div class="post-body">Seeking GDP-certified, FDA-registered warehouse in Puerto Rico for pharmaceutical client. Minimum 5,000 sq ft, temperature-controlled sections required, same-day distribution capability.</div>
+      <div class="post-foot">
+        <div class="post-meta">FSC Member · Miami FL · 1 day ago · 🛡 Verified</div>
+        <button class="post-reply-btn" onclick="toast('Connect request sent — member will reply within 24hrs')">💬 Connect</button>
+      </div>
+    </div>
+
+    <div class="post-item">
+      <div class="post-head">
+        <span class="post-type-badge badge-offer">OFFER</span>
+        <div class="post-title">Origin consolidation Santos Brazil → US East Coast · FCL/LCL</div>
+      </div>
+      <div class="post-body">Handling origin services out of Santos and Paranaguá. Export customs, warehousing, consolidation, CY/CY quotes to US East Coast ports. Strong relationships with Hapag-Lloyd and MSC.</div>
+      <div class="post-foot">
+        <div class="post-meta">FSC Member · Brazil · 1 day ago · 🛡 Verified</div>
+        <button class="post-reply-btn" onclick="toast('Connect request sent — member will reply within 24hrs')">💬 Connect</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APPLICATION FORM -->
+<div class="apply-section" id="apply">
+  <div class="apply-inner">
+    <div class="apply-title">Claim Your Exclusive Territory</div>
+    <div class="apply-sub">One provider per service per market. Fill out your application — our FSC Intelligence team reviews within 48 hours. If your territory is open you will be approved as the exclusive provider.</div>
+
+    <div class="ai-note">
+      <div class="ai-note-icon">🛡</div>
+      <div>Our FSC Intelligence team reviews every application personally. We verify your documents, confirm your specialty, and conduct a brief qualification call before granting exclusive territory rights. This ensures every FSC member is a genuine specialist — not just someone who filled out a form.</div>
+    </div>
+
+    <!-- Company Info -->
+    <div class="form-section-title">① Company Information</div>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">Legal Company Name <span class="req">★</span></label>
+        <input class="form-input" placeholder="Your legal company name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">DBA / Trading Name</label>
+        <input class="form-input" placeholder="If different from legal name">
+      </div>
+    </div>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">Country <span class="req">★</span></label>
+        <select class="form-select">
+          <option value="">Select country...</option>
+          <option>United States</option><option>Mexico</option>
+          <option>Dominican Republic</option><option>Puerto Rico (US)</option>
+          <option>Costa Rica</option><option>Honduras</option>
+          <option>Guatemala</option><option>Panama</option>
+          <option>Brazil</option><option>Colombia</option>
+          <option>Jamaica</option><option>China</option>
+          <option>Vietnam</option><option>Philippines</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">City / State / Region <span class="req">★</span></label>
+        <input class="form-input" placeholder="e.g. Houston, TX">
+      </div>
+    </div>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">Year Established</label>
+        <input class="form-input" placeholder="2005">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Website</label>
+        <input class="form-input" placeholder="www.yourcompany.com">
+      </div>
+    </div>
+
+    <!-- Territory Claim -->
+    <div class="form-section-title">② Territory & Service Claim</div>
+    <div class="form-group">
+      <label class="form-label">Primary Service You Are Claiming <span class="req">★</span></label>
+      <select class="form-select">
+        <option value="">Select your primary service...</option>
+        <option>Port Drayage / Container Handling</option>
+        <option>Cross-Border Trucking (Mexico / US)</option>
+        <option>Domestic FTL / LTL Trucking</option>
+        <option>Ocean Freight FCL / LCL (NVOCC)</option>
+        <option>Origin Agent / Export Consolidation</option>
+        <option>Destination Agent Services</option>
+        <option>Customs Clearance / Brokerage</option>
+        <option>Warehousing / Distribution</option>
+        <option>Order Fulfillment / Pick & Pack</option>
+        <option>Cross-Docking / Transloading</option>
+        <option>Cold Chain / Reefer Logistics</option>
+        <option>Pharmaceutical / GDP Logistics</option>
+        <option>FTZ Services</option>
+        <option>Project Cargo / OOG</option>
+        <option>Air Freight</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Exclusive Territory You Are Claiming <span class="req">★</span></label>
+      <input class="form-input" placeholder="e.g. Houston TX port drayage, Brazil origin agent, Costa Rica destination...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Key Trade Lanes You Cover <span class="req">★</span></label>
+      <textarea class="form-textarea" placeholder="e.g. Monterrey MX → Laredo TX → US, Santos Brazil → US East Coast, Puerto Cortés → Miami/Jacksonville..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cargo Specialties</label>
+      <input class="form-input" placeholder="e.g. Apparel, Auto Parts, Medical Devices, Pharma, Food Grade, Electronics...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Capacity / Equipment / Certifications</label>
+      <input class="form-input" placeholder="e.g. 15 trucks, 50K sq ft warehouse, FDA registered, GDP certified, NVOCC licensed...">
+    </div>
+
+    <!-- Contact -->
+    <div class="form-section-title">③ Primary Contact</div>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">First Name <span class="req">★</span></label>
+        <input class="form-input" placeholder="John">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name <span class="req">★</span></label>
+        <input class="form-input" placeholder="Smith">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Title / Position</label>
+      <input class="form-input" placeholder="VP Operations">
+    </div>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">Business Email <span class="req">★</span></label>
+        <input class="form-input" type="email" placeholder="john@company.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone / WhatsApp <span class="req">★</span></label>
+        <input class="form-input" placeholder="+1 (713) 555-0100">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">LinkedIn Profile</label>
+      <input class="form-input" placeholder="linkedin.com/in/yourname">
+    </div>
+
+    <!-- Billing -->
+    <div class="form-section-title">④ Billing Information</div>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">Billing Email</label>
+        <input class="form-input" type="email" placeholder="accounting@company.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Currency Preference</label>
+        <select class="form-select">
+          <option>USD — US Dollar</option>
+          <option>MXN — Mexican Peso</option>
+          <option>EUR — Euro</option>
+          <option>BRL — Brazilian Real</option>
+          <option>DOP — Dominican Peso</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">Preferred Payment Method</label>
+        <select class="form-select">
+          <option>Wire Transfer</option>
+          <option>ACH (US only)</option>
+          <option>PayPal</option>
+          <option>Zelle (US only)</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bank Name</label>
+        <input class="form-input" placeholder="Chase, Bank of America, BBVA...">
+      </div>
+    </div>
+
+    <!-- Documents -->
+    <div class="form-section-title">⑤ Verification Documents</div>
+    <div style="font-size:10px;color:var(--t3);margin-bottom:12px;line-height:1.6">Required documents are reviewed by our FSC Intelligence team within 48 hours. Upload here or email to fsc@freightsignal.net</div>
+
+    <div class="form-group">
+      <label class="form-label">W-9 / Tax Form <span class="req-badge">REQUIRED — US Companies</span></label>
+      <div class="upload-zone" onclick="document.getElementById('u-w9').click()">
+        <div class="upload-icon">🧾</div>
+        <div class="upload-lbl">W-9 (US) · W-8BEN (International) · Tax Registration</div>
+        <div class="upload-sub">PDF only</div>
+      </div>
+      <input type="file" id="u-w9" style="display:none" accept=".pdf">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Cargo / Freight Liability Insurance <span class="req-badge">REQUIRED FOR VERIFIED BADGE</span></label>
+      <div class="upload-zone" onclick="document.getElementById('u-ins').click()">
+        <div class="upload-icon">🛡</div>
+        <div class="upload-lbl">CARGO INSURANCE CERTIFICATE</div>
+        <div class="upload-sub">Must show coverage amount, expiry, and insured party · PDF or JPG</div>
+      </div>
+      <input type="file" id="u-ins" style="display:none" accept=".pdf,.jpg,.png">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Business License / Company Registration <span class="opt-badge">OPTIONAL</span></label>
+      <div class="upload-zone" onclick="document.getElementById('u-lic').click()">
+        <div class="upload-icon">🏛</div>
+        <div class="upload-lbl">BUSINESS LICENSE OR ARTICLES OF INCORPORATION</div>
+        <div class="upload-sub">State / country business registration · PDF or JPG</div>
+      </div>
+      <input type="file" id="u-lic" style="display:none" accept=".pdf,.jpg,.png">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Customs Bond / Broker License / NVOCC / FMC License <span class="opt-badge">IF APPLICABLE</span></label>
+      <div class="upload-zone" onclick="document.getElementById('u-bond').click()">
+        <div class="upload-icon">🔒</div>
+        <div class="upload-lbl">CUSTOMS BOND · BROKER LICENSE · FMC / NVOCC LICENSE</div>
+        <div class="upload-sub">Any applicable operating license · PDF</div>
+      </div>
+      <input type="file" id="u-bond" style="display:none" accept=".pdf">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Facility Certifications <span class="opt-badge">IF APPLICABLE</span></label>
+      <div class="upload-zone" onclick="document.getElementById('u-cert').click()">
+        <div class="upload-icon">🏭</div>
+        <div class="upload-lbl">FDA REGISTRATION · GDP CERT · ISO · C-TPAT · HACCP</div>
+        <div class="upload-sub">Unlocks specialty badge on your profile · PDF</div>
+      </div>
+      <input type="file" id="u-cert" style="display:none" accept=".pdf,.jpg,.png">
+    </div>
+
+    <!-- Terms -->
+    <div class="form-section-title">⑥ Agreement</div>
+    <div class="terms-box">
+      By submitting this application I confirm that all information provided is accurate and complete. I understand that FreightSignal Connect is a partner matching platform and not a payment guarantee service. Transactions between FSC members are conducted directly and independently — FreightSignal is not a party to, and bears no liability for, any transaction between members. I understand that exclusive territory rights are granted at the sole discretion of the FSC Intelligence team and may be revoked if membership terms are violated. I consent to my company profile being visible to other verified FSC members for the purpose of freight partner matching.
+    </div>
+    <label class="check-item" style="margin-bottom:14px">
+      <input type="checkbox" id="agree-terms"> I have read and agree to the FreightSignal Connect Member Terms
+    </label>
+
+    <button class="submit-btn" onclick="submitApplication()">
+      🛡 SUBMIT APPLICATION — CLAIM MY TERRITORY
+    </button>
+    <div style="text-align:center;margin-top:10px;font-family:var(--fm);font-size:9px;color:var(--t3)">
+      FSC Intelligence team reviews within 48 hours · You will receive a confirmation email
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.style.display = 'block';
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.style.display = 'none', 3500);
+}
+
+function claimTerritory(territory) {
+  document.getElementById('apply').scrollIntoView({behavior:'smooth'});
+  setTimeout(() => toast('Claiming: ' + territory + ' — complete the form below'), 600);
+}
+
+function submitApplication() {
+  const agreed = document.getElementById('agree-terms').checked;
+  if (!agreed) { toast('Please agree to the member terms before submitting'); return; }
+  toast('✅ Application submitted! FSC Intelligence team will review within 48 hours.');
+}
+
+document.querySelectorAll('.post-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.post-tab').forEach(t => t.classList.remove('on'));
+    this.classList.add('on');
+  });
+});
+</script>
+</body>
+</html>

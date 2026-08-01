@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreightSignal — Territory Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#081418;--surf:#0d1f24;--surf2:#122830;
+  --teal:#00C8C8;--teal2:#009898;--teal3:#28e0e0;
+  --t1:#f0f8fa;--t2:#8ab8c0;--t3:#4a7880;
+  --border:rgba(0,200,200,0.10);--border2:rgba(0,200,200,0.24);
+  --red:#ef4444;--amber:#f59e0b;--blue:#3b82f6;--purple:#8b5cf6;--green:#10b981;
+  --ff:"Inter",sans-serif;--fm:"JetBrains Mono",monospace;
+}
+html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--t1);overflow:hidden}
+
+/* ── LAYOUT ─────────────────────────────── */
+.app{display:grid;grid-template-rows:64px 1fr;grid-template-columns:320px 1fr;height:100vh}
+.topbar{grid-column:1/-1;background:rgba(8,20,24,0.97);border-bottom:2px solid var(--teal);display:flex;align-items:center;gap:16px;padding:0 20px;z-index:1000}
+.sidebar{background:var(--surf);border-right:1px solid var(--border2);overflow-y:auto;display:flex;flex-direction:column;z-index:100}
+.map-wrap{position:relative;z-index:1}
+#map{height:100%;width:100%}
+
+/* ── TOPBAR ─────────────────────────────── */
+.brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.brand-icon{width:36px;height:36px}
+.brand-name{font-size:20px;font-weight:900;letter-spacing:-.5px}
+.brand-name em{color:var(--teal);font-style:normal}
+.brand-sub{font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--t3);display:block;margin-top:2px}
+.topbar-divider{width:1px;height:32px;background:var(--border2);flex-shrink:0}
+.trip-input-wrap{display:flex;align-items:center;gap:8px;flex:1;max-width:400px}
+.trip-label{font-family:var(--fm);font-size:9px;letter-spacing:1.5px;color:var(--t3);white-space:nowrap}
+.trip-input{background:var(--surf2);border:1px solid var(--border2);border-radius:6px;color:var(--t1);font-family:var(--ff);font-size:13px;padding:7px 12px;outline:none;transition:border-color .15s;width:200px}
+.trip-input:focus{border-color:var(--teal)}
+.trip-input::placeholder{color:var(--t3)}
+.radius-select{background:var(--surf2);border:1px solid var(--border2);border-radius:6px;color:var(--t1);font-family:var(--fm);font-size:11px;padding:7px 10px;outline:none;cursor:pointer}
+.radius-select option{background:var(--surf2)}
+.btn-find{background:var(--teal);border:none;border-radius:6px;color:var(--bg);font-weight:700;font-size:12px;padding:8px 16px;cursor:pointer;white-space:nowrap;transition:all .15s}
+.btn-find:hover{background:var(--teal3)}
+.topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.stat-chip{font-family:var(--fm);font-size:9px;padding:4px 10px;border-radius:3px;border:1px solid var(--border2);color:var(--t2);white-space:nowrap}
+.stat-chip span{font-weight:700}
+.btn-export{background:transparent;border:1px solid var(--border2);border-radius:6px;color:var(--t2);font-family:var(--fm);font-size:10px;padding:6px 12px;cursor:pointer;transition:all .15s}
+.btn-export:hover{border-color:var(--teal);color:var(--teal)}
+.btn-print{background:transparent;border:1px solid var(--border2);border-radius:6px;color:var(--t2);font-family:var(--fm);font-size:10px;padding:6px 12px;cursor:pointer;transition:all .15s}
+.btn-print:hover{border-color:var(--teal);color:var(--teal)}
+
+/* ── SIDEBAR ────────────────────────────── */
+.sidebar-head{padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sidebar-title{font-family:var(--fm);font-size:9px;letter-spacing:2px;color:var(--teal);text-transform:uppercase;margin-bottom:10px}
+
+/* Legend */
+.legend{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t2)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Filter toggles */
+.filter-row{display:flex;flex-wrap:wrap;gap:5px}
+.filter-btn{font-family:var(--fm);font-size:8px;padding:3px 8px;border-radius:3px;border:1px solid var(--border2);background:transparent;cursor:pointer;transition:all .12s;color:var(--t2);letter-spacing:.5px}
+.filter-btn.on{color:var(--bg);font-weight:700}
+
+/* Import section */
+.import-section{padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.import-title{font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--t3);text-transform:uppercase;margin-bottom:8px}
+.import-btn{width:100%;padding:8px;border-radius:5px;border:1px dashed var(--border2);background:transparent;color:var(--t2);font-family:var(--fm);font-size:9px;cursor:pointer;transition:all .15s;margin-bottom:5px;text-align:center;letter-spacing:.5px}
+.import-btn:hover{border-color:var(--teal);color:var(--teal);background:rgba(0,200,200,0.04)}
+.import-note{font-size:10px;color:var(--t3);line-height:1.5;margin-top:4px}
+
+/* Contact list */
+.contact-list{flex:1;overflow-y:auto;padding:8px}
+.contact-card{background:var(--surf2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:all .15s}
+.contact-card:hover{border-color:var(--border2);background:var(--bg)}
+.contact-card.active{border-color:var(--teal);background:rgba(0,200,200,0.05)}
+.cc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px}
+.cc-name{font-size:12px;font-weight:600;color:var(--t1)}
+.cc-badge{font-family:var(--fm);font-size:7px;padding:2px 5px;border-radius:2px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.cc-company{font-size:10px;color:var(--t2);margin-bottom:2px}
+.cc-meta{font-family:var(--fm);font-size:9px;color:var(--t3)}
+.cc-score{font-family:var(--fm);font-size:10px;font-weight:700}
+
+/* Popup */
+.fs-popup{min-width:240px;font-family:var(--ff)}
+.fs-popup-title{font-size:13px;font-weight:700;color:#0d1f24;margin-bottom:6px}
+.fs-popup-row{display:flex;gap:6px;font-size:11px;color:#334155;margin-bottom:3px}
+.fs-popup-label{font-weight:600;min-width:70px;flex-shrink:0}
+.fs-popup-btn{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:5px 10px;border-radius:4px;background:#00C8C8;color:#081418;font-size:10px;font-weight:700;border:none;cursor:pointer;font-family:"JetBrains Mono",monospace;letter-spacing:.3px}
+
+/* Empty state */
+.empty-state{padding:24px 16px;text-align:center;color:var(--t3);font-size:12px;line-height:1.7}
+.empty-icon{font-size:28px;margin-bottom:8px}
+
+/* Radius circle label */
+.radius-label{background:rgba(8,20,24,0.85);color:#00C8C8;font-family:"JetBrains Mono",monospace;font-size:10px;padding:3px 8px;border-radius:3px;border:1px solid rgba(0,200,200,0.3);white-space:nowrap}
+
+/* Map dark style override */
+.leaflet-tile-pane{filter:brightness(0.85) saturate(0.7) hue-rotate(180deg) invert(1)}
+.leaflet-container{background:#081418}
+
+/* Print styles */
+@media print{
+  .sidebar,.topbar{display:none!important}
+  .app{grid-template-rows:1fr;grid-template-columns:1fr}
+  .map-wrap{height:100vh}
+  #map{height:100vh}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-icon" viewBox="0 0 44 44" fill="none">
+      <path d="M22 2C14.268 2 8 8.268 8 16c0 10 14 26 14 26s14-16 14-26C36 8.268 29.732 2 22 2z" fill="none" stroke="#00C8C8" stroke-width="2.2"/>
+      <circle cx="22" cy="16" r="2" fill="#00C8C8"/>
+      <line x1="22" y1="14" x2="22" y2="10" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="22" y1="10" x2="17" y2="10" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="17" cy="10" r="1.5" fill="#00C8C8"/>
+      <line x1="22" y1="10" x2="27" y2="10" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="27" cy="10" r="1.5" fill="#00C8C8"/>
+      <line x1="22" y1="18" x2="22" y2="22" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="22" y1="22" x2="17" y2="22" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="17" cy="22" r="1.5" fill="#00C8C8"/>
+      <line x1="22" y1="22" x2="27" y2="22" stroke="#00C8C8" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="27" cy="22" r="1.5" fill="#00C8C8"/>
+    </svg>
+    <div>
+      <div class="brand-name">Freight<em>Signal</em></div>
+      <span class="brand-sub">TERRITORY MAP</span>
+    </div>
+  </div>
+
+  <div class="topbar-divider"></div>
+
+  <div class="trip-input-wrap">
+    <span class="trip-label">TRIP TO:</span>
+    <input class="trip-input" id="tripCity" placeholder="Dallas, TX" type="text" onkeydown="if(event.key==='Enter')findCity()">
+    <select class="radius-select" id="radiusMiles" onchange="updateRadius()">
+      <option value="25">25 mi</option>
+      <option value="50" selected>50 mi</option>
+      <option value="100">100 mi</option>
+      <option value="200">200 mi</option>
+    </select>
+    <button class="btn-find" onclick="findCity()">📍 Find</button>
+  </div>
+
+  <div class="topbar-right">
+    <div class="stat-chip">Contacts: <span id="statContacts">0</span></div>
+    <div class="stat-chip">Signals: <span id="statSignals">0</span></div>
+    <div class="stat-chip">In Radius: <span id="statRadius">—</span></div>
+    <button class="btn-export" onclick="exportVisible()">⬇ Export CSV</button>
+    <button class="btn-print" onclick="window.print()">🖨 Print Map</button>
+    <button class="btn-find" style="background:#8b5cf6;border:none;border-radius:6px;color:#fff;font-weight:700;font-size:12px;padding:8px 16px;cursor:pointer;white-space:nowrap" onclick="openTripOutreach()">✈️ Trip Outreach</button>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-head">
+    <div class="sidebar-title">Map Legend</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Pipeline Company</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>LinkedIn Connection</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#00C8C8"></div>Signal Target (HOT)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Signal Target (WARM)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>Import Yeti Target</div>
+    </div>
+    <div class="sidebar-title" style="margin-bottom:6px">Show / Hide</div>
+    <div class="filter-row">
+      <button class="filter-btn on" id="fb-pipeline" style="background:#ef4444;border-color:#ef4444" onclick="toggleLayer('pipeline',this)">PIPELINE</button>
+      <button class="filter-btn on" id="fb-linkedin" style="background:#3b82f6;border-color:#3b82f6" onclick="toggleLayer('linkedin',this)">LINKEDIN</button>
+      <button class="filter-btn on" id="fb-signal" style="background:#00C8C8;border-color:#00C8C8" onclick="toggleLayer('signal',this)">SIGNALS</button>
+      <button class="filter-btn on" id="fb-import" style="background:#8b5cf6;border-color:#8b5cf6" onclick="toggleLayer('import',this)">IMPORT</button>
+    </div>
+  </div>
+
+  <div class="import-section">
+    <div class="import-title">Import Contacts</div>
+    <button class="import-btn" onclick="document.getElementById('csvLinkedIn').click()">📥 LinkedIn Connections CSV</button>
+    <button class="import-btn" onclick="document.getElementById('csvPipeline').click()">📥 Pipeline / CRM CSV</button>
+    <button class="import-btn" onclick="document.getElementById('csvImport').click()">📥 Import Yeti / Customs CSV</button>
+    <button class="import-btn" onclick="document.getElementById('csvIphone').click()">📥 iPhone / Outlook Contacts CSV</button>
+    <input type="file" id="csvLinkedIn" accept=".csv" style="display:none" onchange="loadCSV(this,'linkedin')">
+    <input type="file" id="csvPipeline" accept=".csv" style="display:none" onchange="loadCSV(this,'pipeline')">
+    <input type="file" id="csvImport" accept=".csv" style="display:none" onchange="loadCSV(this,'import')">
+    <input type="file" id="csvIphone" accept=".csv,.vcf" style="display:none" onchange="loadCSV(this,'linkedin')">
+    <div class="import-note">CSV needs: Name, Company, City (or Location). LinkedIn export works directly.</div>
+  </div>
+
+  <div class="contact-list" id="contactList">
+    <div class="empty-state">
+      <div class="empty-icon">📡</div>
+      <div>Import a CSV or click Find to load contacts in your territory.</div>
+      <div style="margin-top:12px;font-size:10px">
+        <strong style="color:var(--t2)">LinkedIn export:</strong><br>
+        LinkedIn → Settings → Data Privacy<br>→ Get a copy of your data → Connections
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAP -->
+<main class="map-wrap">
+  <div id="map"></div>
+</main>
+
+</div>
+
+<script>
+// ── MAP INIT ─────────────────────────────────────────────────────────────
+const map = L.map('map', { zoomControl: true, preferCanvas: true })
+  .setView([29.9, -81.7], 6); // Default: Jacksonville FL
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap',
+  maxZoom: 19
+}).addTo(map);
+
+// ── STATE ────────────────────────────────────────────────────────────────
+let contacts = [];   // all loaded contacts
+let markers  = {};   // { id: L.marker }
+let radiusCircle = null;
+let radiusCenter = null;
+let layerVisible = { pipeline: true, linkedin: true, signal: true, import: true };
+
+// ── COLOR MAP ────────────────────────────────────────────────────────────
+const COLORS = {
+  pipeline: '#ef4444',
+  linkedin: '#3b82f6',
+  signal:   '#00C8C8',
+  warm:     '#f59e0b',
+  import:   '#8b5cf6',
+};
+
+function typeColor(c) {
+  if (c.type === 'signal') return c.tier === 'HOT' ? COLORS.signal : COLORS.warm;
+  return COLORS[c.type] || COLORS.linkedin;
+}
+
+function makeIcon(color, size=12) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,0.6);box-shadow:0 0 6px ${color}88"></div>`,
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
+  });
+}
+
+// ── GEOCODE via Nominatim (free, no key) ─────────────────────────────────
+async function geocode(query) {
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
+      { headers: { 'Accept-Language': 'en' } });
+    const d = await r.json();
+    if (d.length) return { lat: +d[0].lat, lng: +d[0].lon, display: d[0].display_name };
+  } catch(e) {}
+  return null;
+}
+
+// ── FIND CITY ────────────────────────────────────────────────────────────
+async function findCity() {
+  const city = document.getElementById('tripCity').value.trim();
+  if (!city) return;
+  const geo = await geocode(city);
+  if (!geo) { alert('City not found — try "Dallas, TX" or "San Jose, Costa Rica"'); return; }
+
+  const miles = +document.getElementById('radiusMiles').value;
+  const meters = miles * 1609.34;
+
+  map.setView([geo.lat, geo.lng], miles <= 25 ? 11 : miles <= 50 ? 10 : miles <= 100 ? 9 : 7);
+
+  // Draw radius circle
+  if (radiusCircle) { radiusCircle.remove(); }
+  radiusCircle = L.circle([geo.lat, geo.lng], {
+    radius: meters,
+    color: '#00C8C8',
+    weight: 1.5,
+    opacity: 0.6,
+    fillColor: '#00C8C8',
+    fillOpacity: 0.04,
+  }).addTo(map);
+
+  radiusCenter = L.latLng(geo.lat, geo.lng);
+  updateRadiusFilter();
+
+  // Add center marker
+  L.marker([geo.lat, geo.lng], {
+    icon: L.divIcon({
+      className: '',
+      html: `<div style="font-size:22px;line-height:1;filter:drop-shadow(0 0 6px #00C8C8)">📍</div>`,
+      iconSize: [24,24], iconAnchor: [12,24]
+    })
+  }).addTo(map)
+   .bindPopup(`<div class="fs-popup"><div class="fs-popup-title">Trip Destination</div><div class="fs-popup-row"><span class="fs-popup-label">City:</span>${city}</div><div class="fs-popup-row"><span class="fs-popup-label">Radius:</span>${miles} miles</div></div>`);
+}
+
+function updateRadius() {
+  if (radiusCenter && radiusCircle) {
+    const miles = +document.getElementById('radiusMiles').value;
+    radiusCircle.setRadius(miles * 1609.34);
+    updateRadiusFilter();
+  }
+}
+
+function updateRadiusFilter() {
+  if (!radiusCenter) return;
+  const miles = +document.getElementById('radiusMiles').value;
+  const meters = miles * 1609.34;
+  let count = 0;
+  contacts.forEach(c => {
+    if (c.lat && c.lng) {
+      const dist = radiusCenter.distanceTo(L.latLng(c.lat, c.lng));
+      c.inRadius = dist <= meters;
+      if (c.inRadius) count++;
+    }
+  });
+  document.getElementById('statRadius').textContent = count;
+  renderList();
+}
+
+// ── ADD CONTACT TO MAP ───────────────────────────────────────────────────
+function addMarker(c) {
+  if (!c.lat || !c.lng) return;
+  const color = typeColor(c);
+  const size  = c.type === 'signal' ? 14 : 11;
+  const m = L.marker([c.lat, c.lng], { icon: makeIcon(color, size) });
+
+  const score = c.score ? `<div class="fs-popup-row"><span class="fs-popup-label">Score:</span><strong style="color:${color}">${c.score}/100</strong></div>` : '';
+  const lane  = c.trade_lane ? `<div class="fs-popup-row"><span class="fs-popup-label">Trade Lane:</span>${c.trade_lane}</div>` : '';
+  const angle = c.freight_angle ? `<div style="margin-top:6px;padding:6px 8px;background:#f0fdf4;border-radius:4px;font-size:10px;color:#334155;line-height:1.5"><strong>📦 Freight angle:</strong> ${c.freight_angle}</div>` : '';
+  const li_btn = c.li_message ? `<button class="fs-popup-btn" onclick="copyLI('${c.id}')">💼 Copy LinkedIn Message</button>` : '';
+
+  m.bindPopup(`
+    <div class="fs-popup">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div>
+        <div class="fs-popup-title">${c.name || c.company || 'Contact'}</div>
+      </div>
+      ${c.title ? `<div class="fs-popup-row"><span class="fs-popup-label">Title:</span>${c.title}</div>` : ''}
+      ${c.company ? `<div class="fs-popup-row"><span class="fs-popup-label">Company:</span>${c.company}</div>` : ''}
+      ${c.city ? `<div class="fs-popup-row"><span class="fs-popup-label">Location:</span>${c.city}</div>` : ''}
+      ${c.type ? `<div class="fs-popup-row"><span class="fs-popup-label">Type:</span>${c.type.charAt(0).toUpperCase()+c.type.slice(1)}</div>` : ''}
+      ${score}${lane}${angle}${li_btn}
+    </div>`, { maxWidth: 280 });
+
+  m.on('click', () => highlightCard(c.id));
+  markers[c.id] = m;
+  if (layerVisible[c.type]) m.addTo(map);
+}
+
+// ── LOAD CSV ─────────────────────────────────────────────────────────────
+function loadCSV(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  Papa.parse(file, {
+    header: true, skipEmptyLines: true,
+    complete: async (results) => {
+      const rows = results.data;
+      const fields = Object.keys(rows[0] || {});
+      console.log('CSV fields:', fields);
+
+      // Map common field names
+      const get = (row, ...keys) => {
+        for (const k of keys) {
+          const match = fields.find(f => f.toLowerCase().includes(k.toLowerCase()));
+          if (match && row[match]) return row[match].trim();
+        }
+        return '';
+      };
+
+      let added = 0;
+      for (const row of rows) {
+        const name    = get(row,'first name','name','full name') + ' ' + get(row,'last name');
+        const company = get(row,'company','organization','employer','account');
+        const title   = get(row,'title','position','role','job');
+        const city    = get(row,'city','location','address','region','geography') ||
+                        get(row,'connected on') || '';  // LinkedIn sometimes has location in different field
+
+        if (!name.trim() && !company) continue;
+
+        const cityStr = city || company; // fallback to company if no city
+        if (!cityStr) continue;
+
+        const id = `${type}-${Date.now()}-${Math.random()}`;
+        const c = { id, type, name: name.trim(), company, title, city: cityStr,
+                    inRadius: false, lat: null, lng: null };
+
+        // Geocode (batch with delay to respect Nominatim limits)
+        await new Promise(r => setTimeout(r, 300));
+        const geo = await geocode(cityStr + ', USA');
+        if (geo) { c.lat = geo.lat; c.lng = geo.lng; }
+
+        contacts.push(c);
+        addMarker(c);
+        added++;
+
+        // Update stats live
+        updateStats();
+        if (added % 5 === 0) renderList();
+      }
+
+      renderList();
+      updateStats();
+      alert(`✅ Loaded ${added} contacts from ${file.name}`);
+      input.value = '';
+    }
+  });
+}
+
+// ── ADD DEMO DATA ────────────────────────────────────────────────────────
+function loadDemoData() {
+  const demos = [
+    // Pipeline companies
+    { id:'p1', type:'pipeline', name:'Sarah Johnson',    title:'VP Supply Chain', company:'Hanes Brands Honduras', city:'San Pedro Sula, Honduras', lat:15.5020, lng:-88.0244 },
+    { id:'p2', type:'pipeline', name:'Carlos Mejía',     title:'Dir. Logistics',  company:'Boston Scientific CR',  city:'Coyol, Costa Rica',        lat:9.9281,  lng:-84.0907 },
+    { id:'p3', type:'pipeline', name:'Maria Rodriguez',  title:'Head of Ops',     company:'PriceSmart Panama',     city:'Panama City, Panama',      lat:8.9936,  lng:-79.5197 },
+    { id:'p4', type:'pipeline', name:'James Williams',   title:'VP Logistics',    company:'Chewy Inc',             city:'Ocala, FL',                lat:29.1872, lng:-82.1401 },
+    // LinkedIn connections
+    { id:'l1', type:'linkedin', name:'Mike Thompson',    title:'CCO',             company:'Trailer Bridge',        city:'Jacksonville, FL',         lat:30.3322, lng:-81.6557 },
+    { id:'l2', type:'linkedin', name:'Ana Gutierrez',    title:'Dir. Freight',    company:'DHL Guatemala',         city:'Guatemala City, Guatemala', lat:14.6349, lng:-90.5069 },
+    { id:'l3', type:'linkedin', name:'David Park',       title:'VP Sales',        company:'Yusen Logistics',       city:'Miami, FL',                lat:25.7617, lng:-80.1918 },
+    { id:'l4', type:'linkedin', name:'Jennifer Cruz',    title:'BDM',             company:'Maersk DR',             city:'Santo Domingo, DR',        lat:18.4861, lng:-69.9312 },
+    { id:'l5', type:'linkedin', name:'Roberto Vargas',   title:'GM Logistics',    company:'Crown Freight CR',      city:'San Jose, Costa Rica',     lat:9.9281,  lng:-84.0907 },
+    // Signal targets
+    { id:'s1', type:'signal',   name:'Tesla Gigafactory',   company:'Tesla', title:'$2B plant expansion', city:'Monterrey, Mexico', lat:25.6866, lng:-100.3161,
+      tier:'HOT', score:96, freight_angle:'New EV plant adds massive cross-border freight volume — MX → US border lanes', trade_lane:'Monterrey → Laredo TX → US',
+      li_message:'Hi [Name] — I saw the Tesla Gigafactory Monterrey expansion announcement. We handle cross-border freight on the Monterrey → Laredo corridor regularly. Would love to connect ahead of your logistics planning.' },
+    { id:'s2', type:'signal',   name:'Nestlé Guatemala', company:'Nestlé', title:'$120M nutrition plant', city:'Guatemala City, Guatemala', lat:14.6349, lng:-90.5069,
+      tier:'HOT', score:88, freight_angle:'New manufacturing adds ocean freight through Puerto Quetzal → US East Coast', trade_lane:'Puerto Quetzal → Miami/Jacksonville',
+      li_message:'Hi [Name] — I noticed the Nestlé Guatemala $120M expansion announcement. We move freight through Puerto Quetzal regularly. Worth connecting?' },
+    { id:'s3', type:'signal',   name:'Philip Morris DR', company:'PMI', title:'$600M La Romana plant', city:'La Romana, Dominican Republic', lat:18.4273, lng:-68.9728,
+      tier:'WARM', score:74, freight_angle:'Major manufacturing investment increases import of raw materials through Puerto Caucedo', trade_lane:'Puerto Caucedo → US East Coast' },
+    // Import targets
+    { id:'i1', type:'import',   name:'Apparel Importer',  company:'Fruit of the Loom HN', title:'24 shipments/yr', city:'San Pedro Sula, Honduras', lat:15.4994, lng:-88.0200,
+      freight_angle:'High volume apparel importer — 24 shipments/yr through Puerto Cortés. No established forwarder relationship identified.' },
+    { id:'i2', type:'import',   name:'Medical Devices CR', company:'Medtronic CR', title:'18 shipments/yr', city:'Coyol, Costa Rica', lat:9.9000, lng:-84.1100,
+      freight_angle:'Medical device exporter through Caldera — consistent volume, time-sensitive freight.' },
+  ];
+
+  demos.forEach(c => {
+    c.inRadius = false;
+    contacts.push(c);
+    addMarker(c);
+  });
+  updateStats();
+  renderList();
+}
+
+// ── RENDER SIDEBAR LIST ───────────────────────────────────────────────────
+function renderList() {
+  const list = document.getElementById('contactList');
+  const visible = contacts.filter(c => layerVisible[c.type]);
+  const inRadius = visible.filter(c => c.inRadius);
+  const show = inRadius.length > 0 ? inRadius : visible;
+
+  if (show.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📡</div><div>No contacts loaded yet.<br>Import a CSV or load demo data.</div></div>`;
+    return;
+  }
+
+  // Sort: signals first, then by score/type
+  show.sort((a,b) => {
+    const score = (b.score||0) - (a.score||0);
+    if (score !== 0) return score;
+    if (a.type === 'signal' && b.type !== 'signal') return -1;
+    if (b.type === 'signal' && a.type !== 'signal') return 1;
+    return 0;
+  });
+
+  const header = inRadius.length > 0
+    ? `<div style="font-family:var(--fm);font-size:9px;color:var(--teal);letter-spacing:1px;padding:4px 4px 8px">${inRadius.length} CONTACTS IN RADIUS</div>`
+    : `<div style="font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:1px;padding:4px 4px 8px">ALL ${show.length} CONTACTS</div>`;
+
+  list.innerHTML = header + show.map(c => {
+    const color = typeColor(c);
+    const badge = c.type === 'signal' ? (c.tier||'SIGNAL') : c.type.toUpperCase();
+    const score = c.score ? `<span class="cc-score" style="color:${color}">${c.score}</span>` : '';
+    return `<div class="contact-card" id="card-${c.id}" onclick="focusContact('${c.id}')">
+      <div class="cc-top">
+        <div class="cc-name">${c.name || c.company || 'Unknown'}</div>
+        <span class="cc-badge" style="background:${color}22;color:${color};border:1px solid ${color}44">${badge}</span>
+      </div>
+      ${c.title ? `<div class="cc-company">${c.title}</div>` : ''}
+      ${c.company ? `<div class="cc-meta">${c.company}</div>` : ''}
+      <div class="cc-meta" style="margin-top:2px;display:flex;justify-content:space-between">
+        <span>📍 ${c.city||'—'}</span>${score}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function focusContact(id) {
+  const c = contacts.find(x => x.id === id);
+  if (!c || !c.lat) return;
+  map.setView([c.lat, c.lng], 12);
+  if (markers[id]) markers[id].openPopup();
+  highlightCard(id);
+}
+
+function highlightCard(id) {
+  document.querySelectorAll('.contact-card').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById(`card-${id}`);
+  if (el) { el.classList.add('active'); el.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+}
+
+// ── LAYER TOGGLE ─────────────────────────────────────────────────────────
+function toggleLayer(type, btn) {
+  layerVisible[type] = !layerVisible[type];
+  const on = layerVisible[type];
+  const color = COLORS[type] || COLORS.linkedin;
+  btn.style.background = on ? color : 'transparent';
+  btn.style.color = on ? '#081418' : 'var(--t2)';
+  btn.style.borderColor = on ? color : 'var(--border2)';
+
+  contacts.filter(c => c.type === type).forEach(c => {
+    if (!markers[c.id]) return;
+    if (on) markers[c.id].addTo(map);
+    else markers[c.id].remove();
+  });
+  renderList();
+}
+
+// ── STATS ────────────────────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('statContacts').textContent =
+    contacts.filter(c => c.type !== 'signal').length;
+  document.getElementById('statSignals').textContent =
+    contacts.filter(c => c.type === 'signal').length;
+}
+
+// ── COPY LINKEDIN MSG ────────────────────────────────────────────────────
+function copyLI(id) {
+  const c = contacts.find(x => x.id === id);
+  if (c?.li_message) {
+    navigator.clipboard.writeText(c.li_message).then(() => alert('✅ LinkedIn message copied! Paste into LinkedIn.'));
+  }
+}
+
+// ── EXPORT CSV ───────────────────────────────────────────────────────────
+function exportVisible() {
+  const miles = +document.getElementById('radiusMiles').value;
+  const city  = document.getElementById('tripCity').value || 'All';
+  const data  = contacts.filter(c => !radiusCenter || c.inRadius);
+  if (!data.length) { alert('No contacts to export. Set a trip city first.'); return; }
+
+  const rows = [['Name','Title','Company','City','Type','Score','Trade Lane','Freight Angle','LinkedIn Message']];
+  data.forEach(c => rows.push([
+    c.name||'', c.title||'', c.company||'', c.city||'',
+    c.type||'', c.score||'', c.trade_lane||'', c.freight_angle||'', c.li_message||''
+  ]));
+
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type:'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `freightsignal-map-${city.replace(/[^a-z0-9]/gi,'-')}-${miles}mi.csv`;
+  a.click();
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────
+loadDemoData();
+
+// Keyboard shortcut
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.activeElement === document.getElementById('tripCity')) findCity();
+});
+</script>
+
+<!-- TRIP OUTREACH MODAL -->
+<div id="tripModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(8,20,24,0.92);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeTripModal()">
+  <div style="background:#0d1f24;border:1px solid rgba(0,200,200,0.24);border-radius:12px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 40px 100px rgba(0,0,0,0.6)">
+
+    <!-- Header -->
+    <div style="background:#122830;padding:16px 24px;border-bottom:2px solid #00C8C8;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:#4a7880;text-transform:uppercase;margin-bottom:3px">AI-Powered Trip Outreach</div>
+        <div style="font-size:18px;font-weight:800;color:#fff">✈️ I'll Be In Your Market</div>
+      </div>
+      <button onclick="closeTripModal()" style="background:none;border:none;color:#4a7880;font-size:22px;cursor:pointer">✕</button>
+    </div>
+
+    <div style="padding:22px 24px">
+
+      <!-- Trip details -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+        <div>
+          <label style="display:block;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">Trip City</label>
+          <input id="tm-city" type="text" placeholder="Dallas, TX" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.15);border-radius:6px;color:#f0f8fa;font-family:'Inter',sans-serif;font-size:13px;padding:9px 12px;outline:none" value="">
+        </div>
+        <div>
+          <label style="display:block;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">Visit Date</label>
+          <input id="tm-date" type="text" placeholder="September 7th" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.15);border-radius:6px;color:#f0f8fa;font-family:'Inter',sans-serif;font-size:13px;padding:9px 12px;outline:none">
+        </div>
+        <div>
+          <label style="display:block;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">Radius</label>
+          <select id="tm-radius" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.15);border-radius:6px;color:#f0f8fa;font-family:'JetBrains Mono',monospace;font-size:11px;padding:9px 12px;outline:none;cursor:pointer">
+            <option value="25">25 miles</option>
+            <option value="50" selected>50 miles</option>
+            <option value="100">100 miles</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Your info -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+        <div>
+          <label style="display:block;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">Your Name</label>
+          <input id="tm-name" type="text" placeholder="Jeff Vaughn" value="Jeff Vaughn" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.15);border-radius:6px;color:#f0f8fa;font-family:'Inter',sans-serif;font-size:13px;padding:9px 12px;outline:none">
+        </div>
+        <div>
+          <label style="display:block;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:5px">Company & Title</label>
+          <input id="tm-company" type="text" placeholder="CBX Global · SVP Business Development" value="CBX Global · SVP Business Development" style="width:100%;background:#122830;border:1px solid rgba(0,200,200,0.15);border-radius:6px;color:#f0f8fa;font-family:'Inter',sans-serif;font-size:13px;padding:9px 12px;outline:none">
+        </div>
+      </div>
+
+      <!-- Message tone -->
+      <div style="margin-bottom:20px">
+        <label style="display:block;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;color:#4a7880;text-transform:uppercase;margin-bottom:8px">Message Tone</label>
+        <div style="display:flex;gap:8px">
+          <button class="tone-btn on" id="tone-warm" onclick="setTone('warm',this)">😊 Warm & Personal</button>
+          <button class="tone-btn" id="tone-pro" onclick="setTone('professional',this)">💼 Professional</button>
+          <button class="tone-btn" id="tone-brief" onclick="setTone('brief',this)">⚡ Short & Direct</button>
+        </div>
+      </div>
+
+      <!-- Generate button -->
+      <button onclick="generateTripOutreach()" id="tm-generate-btn"
+        style="width:100%;padding:12px;border-radius:8px;border:none;background:#00C8C8;color:#081418;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:16px;transition:all .2s">
+        🤖 Generate Outreach for All Contacts in Radius
+      </button>
+
+      <!-- Results -->
+      <div id="tm-results" style="display:none">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:#00C8C8;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(0,200,200,0.1)" id="tm-results-header"></div>
+        <div id="tm-cards"></div>
+        <button onclick="exportTripOutreach()" style="width:100%;margin-top:14px;padding:10px;border-radius:6px;border:1px solid rgba(0,200,200,0.3);background:transparent;color:#00C8C8;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.5px">
+          ⬇ EXPORT ALL AS CSV
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+.tone-btn{padding:7px 14px;border-radius:5px;border:1px solid rgba(0,200,200,0.2);background:transparent;color:#8ab8c0;font-family:'JetBrains Mono',monospace;font-size:9px;cursor:pointer;transition:all .15s;letter-spacing:.5px}
+.tone-btn.on{background:rgba(0,200,200,0.12);border-color:#00C8C8;color:#00C8C8;font-weight:700}
+.outreach-card{background:#122830;border:1px solid rgba(0,200,200,0.12);border-radius:8px;padding:16px;margin-bottom:10px}
+.outreach-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.outreach-card-name{font-size:13px;font-weight:700;color:#f0f8fa}
+.outreach-card-meta{font-size:10px;color:#8ab8c0;margin-bottom:8px}
+.outreach-msg-box{background:#081418;border:1px solid rgba(0,200,200,0.1);border-radius:5px;padding:10px 12px;font-size:11px;color:#8ab8c0;line-height:1.65;white-space:pre-wrap;margin-bottom:8px}
+.outreach-subject{font-family:'JetBrains Mono',monospace;font-size:9px;color:#00C8C8;margin-bottom:4px;font-weight:700}
+.copy-row{display:flex;gap:6px}
+.copy-li-btn{padding:5px 12px;border-radius:4px;background:#00C8C8;color:#081418;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;border:none;cursor:pointer;transition:all .15s;letter-spacing:.5px}
+.copy-li-btn:hover{background:#28e0e0}
+.copy-email-btn{padding:5px 12px;border-radius:4px;background:transparent;border:1px solid rgba(0,200,200,0.3);color:#00C8C8;font-family:'JetBrains Mono',monospace;font-size:8px;cursor:pointer;transition:all .15s;letter-spacing:.5px}
+.copy-email-btn:hover{background:rgba(0,200,200,0.08)}
+</style>
+
+</body>
+</html>
